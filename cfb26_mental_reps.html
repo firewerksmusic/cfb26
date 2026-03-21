@@ -1,0 +1,1262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>CFB26 — Mental Reps</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@400;500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0a0c0f;--bg2:#111318;--bg3:#1a1d24;--bg4:#22262f;
+  --border:#2a2f3a;--accent:#e8c547;--accent2:#4a9eff;
+  --red:#e85547;--green:#52d48a;--purple:#c084fc;
+  --text:#e8eaf0;--text2:#8a90a0;--text3:#555c6e;
+  --run:#e8c547;--pass:#4a9eff;--rpo:#c084fc;--pa:#52d48a;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+.app{display:flex;flex-direction:column;height:100vh;height:100dvh}
+
+/* ── HEADER / SCOREBOARD ── */
+.scoreboard{background:var(--bg2);border-bottom:2px solid var(--border);padding:10px 16px;flex-shrink:0}
+.sb-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.sb-logo{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px;color:var(--accent)}
+.sb-score{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;color:var(--text)}
+.sb-new-drive{background:none;border:1px solid var(--border);color:var(--text2);font-size:11px;font-family:'Inter',sans-serif;padding:5px 10px;border-radius:5px;cursor:pointer;transition:all .15s}
+.sb-new-drive:active{background:var(--bg3)}
+.sb-bottom{display:flex;gap:16px;align-items:center}
+.sb-stat{text-align:center}
+.sb-stat-val{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:1px;color:var(--accent);line-height:1}
+.sb-stat-lbl{font-family:'DM Mono',monospace;font-size:8px;color:var(--text3);letter-spacing:1px}
+.sb-divider{width:1px;height:28px;background:var(--border)}
+.field-pos{font-family:'DM Mono',monospace;font-size:12px;color:var(--text2);flex:1;text-align:right}
+.drive-log{background:var(--bg3);border-radius:6px;padding:6px 10px;margin-top:6px;font-family:'DM Mono',monospace;font-size:10px;color:var(--text3);min-height:20px;line-height:1.6}
+
+/* ── MAIN CONTENT ── */
+.content{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+
+/* ── PHASE SCREENS ── */
+.phase{display:none;padding:16px;animation:fadeIn .2s ease}
+.phase.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── PHASE 1: PLAY CALL ── */
+.section-label{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--text3);margin-bottom:8px}
+.situation-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:20px}
+.sit-btn{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 12px;cursor:pointer;transition:all .15s;text-align:left}
+.sit-btn:active,.sit-btn.active{background:var(--bg4);border-color:var(--accent)}
+.sit-btn.active .sit-btn-name{color:var(--accent)}
+.sit-btn-name{font-size:12px;font-weight:600;color:var(--text);line-height:1.3}
+.sit-btn-group{font-size:9px;font-family:'DM Mono',monospace;color:var(--text3);margin-top:2px;letter-spacing:.5px}
+.play-list{display:flex;flex-direction:column;gap:6px}
+.play-option{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px 14px;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:10px}
+.play-option:active{background:var(--bg4);transform:scale(.98)}
+.play-option-name{flex:1;font-size:14px;font-weight:600;color:var(--text)}
+.play-option-form{font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;margin-top:2px}
+.type-badge{font-size:8px;font-weight:700;letter-spacing:1px;padding:3px 6px;border-radius:3px;font-family:'DM Mono',monospace;flex-shrink:0}
+.badge-RUN{background:rgba(232,197,71,.15);color:var(--run)}
+.badge-PASS{background:rgba(74,158,255,.15);color:var(--pass)}
+.badge-RPO{background:rgba(192,132,252,.15);color:var(--rpo)}
+.badge-PA{background:rgba(82,212,138,.15);color:var(--pa)}
+
+/* ── PHASE 2: PRE-SNAP ── */
+.field-diagram{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:14px;position:relative;overflow:hidden}
+.field-grass{position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent,transparent 48%,rgba(255,255,255,.02) 48%,rgba(255,255,255,.02) 52%);pointer-events:none}
+.field-los{position:absolute;left:50%;top:0;bottom:0;width:2px;background:rgba(232,197,71,.3);pointer-events:none}
+.formation-layer{position:relative;z-index:2;padding:8px 0}
+.player-row{display:flex;justify-content:center;align-items:center;gap:0;margin:6px 0;position:relative}
+.player{display:flex;flex-direction:column;align-items:center;gap:1px;width:40px}
+.player-icon{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;font-family:'DM Mono',monospace;border:2px solid;line-height:1}
+.player-lbl{font-size:7px;font-family:'DM Mono',monospace;color:var(--text3);letter-spacing:.3px;text-align:center;white-space:nowrap}
+/* Offense — gold */
+.off{border-color:var(--accent)!important;background:rgba(232,197,71,.12)!important;color:var(--accent)!important}
+/* Defense — red/blue based on coverage */
+.def-man{border-color:var(--red)!important;background:rgba(232,85,71,.12)!important;color:var(--red)!important}
+.def-zone{border-color:var(--accent2)!important;background:rgba(74,158,255,.12)!important;color:var(--accent2)!important}
+.def-deep{border-color:var(--purple)!important;background:rgba(192,132,252,.12)!important;color:var(--purple)!important}
+
+.coverage-banner{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 14px;margin-bottom:12px}
+.cov-banner-name{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;margin-bottom:4px}
+.cov-banner-tells{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+.tell-chip{font-size:9px;font-family:'DM Mono',monospace;padding:2px 7px;border-radius:3px;background:rgba(82,212,138,.1);color:var(--green);border:1px solid rgba(82,212,138,.2)}
+
+.pre-snap-note{background:rgba(232,197,71,.07);border:1px solid rgba(232,197,71,.2);border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:var(--text);line-height:1.6}
+.pre-snap-note strong{color:var(--accent)}
+
+.action-btns{display:flex;flex-direction:column;gap:8px}
+.btn-primary{background:var(--accent);color:#000;border:none;border-radius:8px;padding:14px;font-size:14px;font-weight:700;font-family:'Inter',sans-serif;cursor:pointer;transition:all .15s;letter-spacing:.3px}
+.btn-primary:active{transform:scale(.97)}
+.btn-secondary{background:var(--bg3);color:var(--text2);border:1px solid var(--border);border-radius:8px;padding:12px;font-size:13px;font-weight:500;font-family:'Inter',sans-serif;cursor:pointer;transition:all .15s}
+.btn-secondary:active{background:var(--bg4)}
+.btn-danger{background:rgba(232,85,71,.12);color:var(--red);border:1px solid rgba(232,85,71,.3);border-radius:8px;padding:12px;font-size:13px;font-weight:500;font-family:'Inter',sans-serif;cursor:pointer;transition:all .15s}
+
+/* ── PHASE 3: AUDIBLE ── */
+.audible-list{display:flex;flex-direction:column;gap:8px}
+.audible-play{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px 14px;cursor:pointer;transition:all .15s}
+.audible-play:active{background:var(--bg4)}
+.audible-play-top{display:flex;align-items:center;gap:10px;margin-bottom:4px}
+.audible-why{font-size:11px;color:var(--text2);line-height:1.5;font-style:italic}
+
+/* ── PHASE 4: POST-SNAP READ ── */
+.read-diagram{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:12px}
+.defender-reacts{background:rgba(232,85,71,.08);border:1px solid rgba(232,85,71,.2);border-radius:8px;padding:10px 14px;margin-bottom:12px;font-size:12px;color:var(--text);line-height:1.6}
+.defender-reacts strong{color:var(--red)}
+.read-prompt{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:1px;color:var(--text);margin-bottom:10px}
+.read-options{display:flex;flex-direction:column;gap:8px}
+.read-opt{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:14px;cursor:pointer;transition:all .15s;font-size:13px;color:var(--text);font-weight:500;line-height:1.4}
+.read-opt:active{background:var(--bg4);transform:scale(.98)}
+
+/* ── PHASE 5: RESULT ── */
+.result-yards{font-family:'Bebas Neue',sans-serif;font-size:72px;letter-spacing:-2px;text-align:center;line-height:1;margin:16px 0 4px}
+.result-yards.positive{color:var(--green)}
+.result-yards.zero{color:var(--text2)}
+.result-yards.negative{color:var(--red)}
+.result-grade{text-align:center;margin-bottom:16px}
+.grade-badge{display:inline-block;font-family:'DM Mono',monospace;font-size:11px;font-weight:700;letter-spacing:2px;padding:5px 14px;border-radius:4px}
+.grade-perfect{background:rgba(82,212,138,.15);color:var(--green);border:1px solid rgba(82,212,138,.3)}
+.grade-good{background:rgba(74,158,255,.15);color:var(--accent2);border:1px solid rgba(74,158,255,.3)}
+.grade-ok{background:rgba(232,197,71,.15);color:var(--accent);border:1px solid rgba(232,197,71,.3)}
+.grade-miss{background:rgba(232,85,71,.15);color:var(--red);border:1px solid rgba(232,85,71,.3)}
+.result-explanation{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:14px 16px;margin-bottom:14px;font-size:13px;color:var(--text);line-height:1.7}
+.result-explanation strong{color:var(--accent)}
+.result-next-state{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:12px 16px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center}
+.next-state-down{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;color:var(--text)}
+.next-state-detail{font-size:12px;color:var(--text2);text-align:right}
+.result-actions{display:flex;flex-direction:column;gap:8px}
+
+/* ── DRIVE COMPLETE ── */
+.drive-complete{text-align:center;padding:20px 0}
+.dc-emoji{font-size:56px;margin-bottom:12px}
+.dc-result{font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:3px;margin-bottom:8px}
+.dc-stats{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:14px 16px;margin:16px 0;text-align:left}
+.dc-stat-row{display:flex;justify-content:space-between;margin-bottom:6px;font-size:12px}
+.dc-stat-lbl{color:var(--text2)}
+.dc-stat-val{font-weight:600;color:var(--text);font-family:'DM Mono',monospace}
+
+/* ── MISC ── */
+.phase-title{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:2px;color:var(--accent);margin-bottom:4px}
+.phase-sub{font-size:12px;color:var(--text2);margin-bottom:16px;line-height:1.5}
+.divider{height:1px;background:var(--border);margin:16px 0}
+.selected-play-bar{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px}
+.spb-name{font-size:14px;font-weight:600;color:var(--text);flex:1}
+.spb-form{font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;margin-top:2px}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- SCOREBOARD -->
+<div class="scoreboard">
+  <div class="sb-top">
+    <div class="sb-logo">MENTAL REPS</div>
+    <div class="sb-score" id="sbScore">0 — 0</div>
+    <button class="sb-new-drive" onclick="newDrive()">NEW DRIVE</button>
+  </div>
+  <div class="sb-bottom">
+    <div class="sb-stat">
+      <div class="sb-stat-val" id="sbDown">1ST</div>
+      <div class="sb-stat-lbl">DOWN</div>
+    </div>
+    <div class="sb-divider"></div>
+    <div class="sb-stat">
+      <div class="sb-stat-val" id="sbDist">& 10</div>
+      <div class="sb-stat-lbl">DIST</div>
+    </div>
+    <div class="sb-divider"></div>
+    <div class="sb-stat">
+      <div class="sb-stat-val" id="sbPlays">0</div>
+      <div class="sb-stat-lbl">PLAYS</div>
+    </div>
+    <div class="sb-divider"></div>
+    <div class="sb-stat">
+      <div class="sb-stat-val" id="sbGrade">—</div>
+      <div class="sb-stat-lbl">GRADE</div>
+    </div>
+    <div class="field-pos" id="sbFieldPos">OWN 25</div>
+  </div>
+  <div class="drive-log" id="driveLog">Select a situation to begin your drive.</div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="content">
+
+  <!-- PHASE 1: PLAY CALL -->
+  <div class="phase active" id="phase-playcall">
+    <div class="phase-title">PLAY CALL</div>
+    <div class="phase-sub" id="playcallSub">Select a game plan situation, then pick your play.</div>
+    <div class="section-label">GAME PLAN SITUATION</div>
+    <div class="situation-grid" id="situationGrid"></div>
+    <div id="playListWrap" style="display:none">
+      <div class="section-label" id="playListLabel">PLAYS</div>
+      <div class="play-list" id="playList"></div>
+    </div>
+  </div>
+
+  <!-- PHASE 2: PRE-SNAP -->
+  <div class="phase" id="phase-presnap">
+    <div class="phase-title">PRE-SNAP</div>
+    <div class="phase-sub">Identify the defense and decide: run the play or audible.</div>
+    <div class="selected-play-bar" id="preSnapPlayBar"></div>
+    <div class="field-diagram" id="fieldDiagram"></div>
+    <div class="coverage-banner" id="coverageBanner"></div>
+    <div class="pre-snap-note" id="preSnapNote"></div>
+    <div class="action-btns">
+      <button class="btn-primary" onclick="goToPostSnap()">▶ SNAP THE BALL</button>
+      <button class="btn-secondary" onclick="goToAudible()">🔄 AUDIBLE</button>
+      <button class="btn-secondary" onclick="goToPhase('phase-playcall')" style="font-size:11px;color:var(--text3)">← BACK TO PLAY CALL</button>
+    </div>
+  </div>
+
+  <!-- PHASE 3: AUDIBLE -->
+  <div class="phase" id="phase-audible">
+    <div class="phase-title">AUDIBLE</div>
+    <div class="phase-sub" id="audibleSub">Defense is showing a hard look. Pick your counter.</div>
+    <div class="coverage-banner" id="audibleCovBanner"></div>
+    <div class="section-label">BEST AUDIBLES VS THIS COVERAGE</div>
+    <div class="audible-list" id="audibleList"></div>
+    <div style="margin-top:12px">
+      <button class="btn-secondary" onclick="goToPhase('phase-presnap')">← BACK TO PRE-SNAP</button>
+    </div>
+  </div>
+
+  <!-- PHASE 4: POST-SNAP READ -->
+  <div class="phase" id="phase-postsnap">
+    <div class="phase-title">POST-SNAP READ</div>
+    <div class="phase-sub">The ball is snapped. The defense reacts. Make your read.</div>
+    <div class="selected-play-bar" id="postSnapPlayBar"></div>
+    <div class="field-diagram" id="postSnapDiagram"></div>
+    <div class="defender-reacts" id="defenderReacts"></div>
+    <div class="read-prompt" id="readPrompt">WHERE DO YOU GO?</div>
+    <div class="read-options" id="readOptions"></div>
+  </div>
+
+  <!-- PHASE 5: RESULT -->
+  <div class="phase" id="phase-result">
+    <div class="result-yards" id="resultYards">+8</div>
+    <div class="result-grade" id="resultGrade"></div>
+    <div class="result-explanation" id="resultExplanation"></div>
+    <div class="result-next-state" id="resultNextState"></div>
+    <div class="result-actions">
+      <button class="btn-primary" onclick="nextPlay()">NEXT PLAY →</button>
+      <button class="btn-secondary" onclick="newDrive()">START NEW DRIVE</button>
+    </div>
+  </div>
+
+  <!-- DRIVE COMPLETE -->
+  <div class="phase" id="phase-drivecomplete">
+    <div class="drive-complete">
+      <div class="dc-emoji" id="dcEmoji">🏈</div>
+      <div class="dc-result" id="dcResult">TOUCHDOWN</div>
+      <div style="font-size:13px;color:var(--text2);margin-bottom:4px" id="dcSub">Drive complete</div>
+      <div class="dc-stats" id="dcStats"></div>
+      <button class="btn-primary" onclick="newDrive()" style="width:100%;margin-top:8px">START NEW DRIVE</button>
+    </div>
+  </div>
+
+</div><!-- /content -->
+</div><!-- /app -->
+
+<script>
+// ═══════════════════════════════════════════════════════
+// GAME PLAN DATA — situations and plays from the playbook
+// ═══════════════════════════════════════════════════════
+const GAME_PLAN = [
+  {id:"first_down",label:"1st Down",group:"STANDARD",color:"#52d48a",
+   plays:[
+    {play:"Inside Zone",set:"Gun",f:"Trips TE",type:"RUN"},
+    {play:"Read Option",set:"Gun",f:"Doubles Y Off",type:"RUN"},
+    {play:"Lead Read Option",set:"Pistol",f:"U Off Trips",type:"RUN"},
+    {play:"Crack Toss",set:"Gun",f:"Bunch Str Offset",type:"RUN"},
+    {play:"HB Power O",set:"Singleback",f:"Y Trips",type:"RUN"},
+    {play:"RPO Alert Bubble",set:"Gun",f:"Trips TE",type:"RPO"},
+    {play:"HB Counter",set:"Gun",f:"Y Off Trips",type:"RUN"},
+    {play:"Power Read",set:"Gun",f:"Normal Y Off Wk",type:"RUN"},
+    {play:"Escort Power Read Toss",set:"Gun",f:"Bunch TE",type:"RUN"},
+    {play:"Jet Power Read",set:"Gun",f:"Doubles Y Off",type:"RUN"}
+  ]},
+  {id:"second_long",label:"2nd & Long",group:"STANDARD",color:"#e85547",
+   plays:[
+    {play:"Four Verticals",set:"Gun",f:"Empty Trey Flex",type:"PASS"},
+    {play:"Dagger",set:"Gun",f:"Bunch Str Offset",type:"PASS"},
+    {play:"Spacing",set:"Gun",f:"Empty Bunch",type:"PASS"},
+    {play:"Shallow Cross",set:"Gun",f:"Normal Y Off Wk",type:"PASS"},
+    {play:"Cheat Clearout Seam",set:"Gun",f:"Trips TE",type:"PASS"},
+    {play:"Mesh Dagger",set:"Gun",f:"Bunch Wide",type:"PASS"},
+    {play:"Levels Switch",set:"Gun",f:"Empty Trey Flex",type:"PASS"},
+    {play:"MTN Mesh Wheel",set:"Gun",f:"Split Slot Offset",type:"PASS"},
+    {play:"Verts Y Delay",set:"Gun",f:"Bunch TE",type:"PASS"},
+    {play:"MTN Smash",set:"Pistol",f:"Empty Tight Stack",type:"PASS"}
+  ]},
+  {id:"second_med",label:"2nd & Medium",group:"STANDARD",color:"#e8c547",
+   plays:[
+    {play:"Texas",set:"Gun",f:"Trips TE",type:"PASS"},
+    {play:"Jet Counter Y",set:"Gun",f:"Doubles Y Off",type:"RUN"},
+    {play:"RPO Duo Alert Post",set:"Gun",f:"Bunch Str Offset",type:"RPO"},
+    {play:"Y Shallow Cross",set:"Gun",f:"Trips TE",type:"PASS"},
+    {play:"Flood",set:"Gun",f:"Bunch Str Offset",type:"PASS"},
+    {play:"Zone Fake Jet",set:"Singleback",f:"Y Trips",type:"RUN"},
+    {play:"Counter Bash",set:"Gun",f:"Normal Y Off Wk",type:"RUN"},
+    {play:"MTN Spacing",set:"Gun",f:"Bunch TE",type:"PASS"},
+    {play:"Orbit HB Split Zone",set:"Pistol",f:"U Off Trips",type:"RUN"},
+    {play:"Curls Slot Whip",set:"Gun",f:"Y Off Trips",type:"PASS"}
+  ]},
+  {id:"second_short",label:"2nd & Short",group:"STANDARD",color:"#52d48a",
+   plays:[
+    {play:"Inside Zone",set:"Gun",f:"Trips TE",type:"RUN"},
+    {play:"Strong Power",set:"Pistol",f:"U Off Trips",type:"RUN"},
+    {play:"HB Power G",set:"Singleback",f:"Y Trips",type:"RUN"},
+    {play:"Duo",set:"Gun",f:"Bunch Str Offset",type:"RUN"},
+    {play:"HB Lead Dive",set:"I-Form",f:"Slot",type:"RUN"},
+    {play:"Power Option",set:"Pistol",f:"Strong Slot",type:"RUN"},
+    {play:"O 1 Trap",set:"Gun",f:"Doubles Y Off",type:"RUN"},
+    {play:"HB Iso",set:"I-Form",f:"Pro",type:"RUN"},
+    {play:"Over Crack Toss",set:"Singleback",f:"Bunch Ace",type:"RUN"},
+    {play:"HB Zone Toss",set:"Gun",f:"Y Off Trips",type:"RUN"}
+  ]},
+  {id:"third_long",label:"3rd & Long",group:"THIRD DOWN",color:"#e85547",
+   plays:[
+    {play:"Four Verticals",set:"Gun",f:"Empty Trey Flex",type:"PASS"},
+    {play:"Cheat Clearout Seam",set:"Gun",f:"Trips TE",type:"PASS"},
+    {play:"Mesh Dagger",set:"Gun",f:"Bunch Wide",type:"PASS"},
+    {play:"Verticals",set:"Gun",f:"Empty Bunch",type:"PASS"},
+    {play:"Double Post",set:"Pistol",f:"Empty Tight Stack",type:"PASS"},
+    {play:"Vertical Y Shake",set:"Gun",f:"Empty Trey Flex",type:"PASS"},
+    {play:"Deep Choice",set:"Gun",f:"Wide Stack",type:"PASS"},
+    {play:"Shakes",set:"Gun",f:"Split Slot Offset",type:"PASS"},
+    {play:"Hi Lo Dig",set:"Gun",f:"Trips X Nasty",type:"PASS"},
+    {play:"Dagger",set:"Gun",f:"Bunch Str Offset",type:"PASS"}
+  ]},
+  {id:"third_med",label:"3rd & Medium",group:"THIRD DOWN",color:"#e8c547",
+   plays:[
+    {play:"Texas",set:"Gun",f:"Trips TE",type:"PASS"},
+    {play:"Inside Cross",set:"Gun",f:"Normal Y Off Wk",type:"PASS"},
+    {play:"Double Under",set:"Gun",f:"Trips TE",type:"PASS"},
+    {play:"Levels Slot Out",set:"Gun",f:"Empty Trey Flex",type:"PASS"},
+    {play:"Cheat Shallow Mills",set:"Gun",f:"Bunch Wide",type:"PASS"},
+    {play:"Curls Slot Whip",set:"Gun",f:"Y Off Trips",type:"PASS"},
+    {play:"Stick",set:"Pistol",f:"U Off Trips",type:"PASS"},
+    {play:"Mesh",set:"Gun",f:"Doubles Y Off",type:"PASS"},
+    {play:"Snag Slot Digs",set:"Gun",f:"Trips X Nasty",type:"PASS"},
+    {play:"MTN Lead Spot Mesh",set:"Gun",f:"Split Slot Offset",type:"PASS"}
+  ]},
+  {id:"third_short",label:"3rd & Short",group:"THIRD DOWN",color:"#52d48a",
+   plays:[
+    {play:"Lead Read Option",set:"Pistol",f:"U Off Trips",type:"RUN"},
+    {play:"Read Option Bubble",set:"Gun",f:"Trips TE",type:"RPO"},
+    {play:"Power O",set:"I-Form",f:"Pro",type:"RUN"},
+    {play:"RPO Alert Bubble",set:"Gun",f:"Normal Y Off Wk",type:"RPO"},
+    {play:"F Lead Read Option",set:"Pistol",f:"Strong Slot",type:"RUN"},
+    {play:"HB Blast",set:"I-Form",f:"Slot",type:"RUN"},
+    {play:"Quick Pitch",set:"Singleback",f:"Bunch Ace",type:"RUN"},
+    {play:"RPO Zone Alert Bubble",set:"Gun",f:"Y Off Trips",type:"RPO"},
+    {play:"Read Option",set:"Gun",f:"Doubles Y Off",type:"RUN"},
+    {play:"Speed Option",set:"Gun",f:"Trips TE",type:"RUN"}
+  ]},
+  {id:"red_zone",label:"Red Zone",group:"SCORING",color:"#e85547",
+   plays:[
+    {play:"Texas",set:"Gun",f:"Trips TE",type:"PASS"},
+    {play:"PA Power O",set:"Goal Line",f:"Normal",type:"PA"},
+    {play:"TE Corner",set:"Gun",f:"Bunch TE",type:"PASS"},
+    {play:"Redzone Scissors",set:"Gun",f:"Doubles Y Off",type:"PASS"},
+    {play:"PA Y Corner",set:"Pistol",f:"U Off Trips",type:"PA"},
+    {play:"Inside Zone",set:"Gun",f:"Trips TE",type:"RUN"},
+    {play:"Quick Fade",set:"Singleback",f:"Ace",type:"PASS"},
+    {play:"Curl Flat Corner",set:"Gun",f:"Bunch TE",type:"PASS"},
+    {play:"MTN Spot Y Corner",set:"Gun",f:"Trips X Nasty",type:"PASS"},
+    {play:"Cross Corner Strike",set:"Gun",f:"Normal Y Off Wk",type:"PASS"}
+  ]},
+  {id:"goal_line",label:"Goal Line",group:"SCORING",color:"#e8c547",
+   plays:[
+    {play:"Power O",set:"Goal Line",f:"Normal",type:"RUN"},
+    {play:"HB Dive",set:"Goal Line",f:"Normal",type:"RUN"},
+    {play:"QB Sneak",set:"Goal Line",f:"Normal",type:"RUN"},
+    {play:"PA Waggle",set:"Goal Line",f:"Normal",type:"PA"},
+    {play:"PA Sprint HB Flat",set:"Goal Line",f:"Normal",type:"PA"},
+    {play:"HB Counter Wk",set:"Goal Line",f:"Normal",type:"RUN"},
+    {play:"Power G Toss",set:"Goal Line",f:"Normal",type:"RUN"},
+    {play:"PA Power O",set:"Goal Line",f:"Normal",type:"PA"},
+    {play:"PA Spot",set:"Goal Line",f:"Normal",type:"PA"},
+    {play:"HB Zone",set:"Goal Line",f:"Normal",type:"RUN"}
+  ]},
+  {id:"two_min",label:"2 Minute",group:"SPECIAL",color:"#4a9eff",
+   plays:[
+    {play:"Four Verticals",set:"Gun",f:"Empty Trey Flex",type:"PASS"},
+    {play:"Spacing",set:"Gun",f:"Empty Bunch",type:"PASS"},
+    {play:"Shallow Cross",set:"Gun",f:"Normal Y Off Wk",type:"PASS"},
+    {play:"Slants",set:"Gun",f:"Doubles Y Off",type:"PASS"},
+    {play:"Levels Switch",set:"Gun",f:"Empty Trey Flex",type:"PASS"},
+    {play:"Quick Unders",set:"Gun",f:"Trips X Nasty",type:"PASS"},
+    {play:"Smoke N Go",set:"Gun",f:"Wide Stack",type:"PASS"},
+    {play:"Bubble Screen",set:"Gun",f:"Bunch Wide",type:"PASS"},
+    {play:"Slot Slants",set:"Gun",f:"Empty Trey Flex",type:"PASS"},
+    {play:"QB Draw",set:"Gun",f:"Empty Bunch",type:"RUN"}
+  ]}
+];
+
+// ═══════════════════════════════════════════════════════
+// COVERAGE DATA
+// ═══════════════════════════════════════════════════════
+const COVERAGES = [
+  {name:"Cover 2",short:"C2",color:"#4a9eff",
+   tells:["Two deep safeties split","Corners near the LOS","Safeties ~12 yards deep"],
+   defenseVs:{RUN:"hard",PASS:"medium",RPO:"light",PA:"hard"},
+   description:"Two-high shell. Corners own the flats. Safeties split the deep halves. Vulnerable to the seam between them.",
+   hardFor:["Four Verticals","Cheat Clearout Seam","Double Post","Verts Y Delay"],
+   goodFor:["Texas","Dagger","Levels Switch","Flood","MTN Smash"]},
+  {name:"Cover 3",short:"C3",color:"#52d48a",
+   tells:["One safety centered deep","Corners bailing pre-snap","Three deep zones"],
+   defenseVs:{RUN:"light",PASS:"medium",RPO:"medium",PA:"hard"},
+   description:"One safety deep middle, corners deep outside. Vulnerable to the flat and crossing routes.",
+   hardFor:["Y Shallow Cross","Flood","Double Under","Corner Strike","PA Y Corner"],
+   goodFor:["Four Verticals","Cheat Clearout Seam","Dagger","Seam Divide"]},
+  {name:"Cover 4",short:"C4",color:"#e8c547",
+   tells:["Four deep defenders","Light box — 5-6 in","LBs shallow, DBs all back"],
+   defenseVs:{RUN:"very light",PASS:"hard",RPO:"light",PA:"medium"},
+   description:"Quarters coverage. Very light box. Vulnerable to the run and the bubble RPO.",
+   hardFor:["RPO Alert Bubble","Read Option","Lead Read Option","Jet Counter Y"],
+   goodFor:["Four Verticals","Vertical Y Shake","Seam Divide","Double Post"]},
+  {name:"Man Coverage",short:"MAN",color:"#e85547",
+   tells:["Defenders tight on WRs","Safety in the box","One or zero deep safeties"],
+   defenseVs:{RUN:"medium",PASS:"hard",RPO:"medium",PA:"very light"},
+   description:"Man-to-man across the board. Beat with rub routes, speed mismatches, and play action.",
+   hardFor:["PA Sprint HB Flat","Cheat Clearout Seam","PA Waggle","TE Corner"],
+   goodFor:["Spacing","Mesh","Vertical Y Shake","Slants"]},
+  {name:"Cover 2 Man",short:"C2M",color:"#c084fc",
+   tells:["Two deep safeties","Corners in press","LBs on HB and TE"],
+   defenseVs:{RUN:"medium",PASS:"hard",RPO:"light",PA:"medium"},
+   description:"Man underneath, two deep safeties. Get the ball out fast — quick RPOs and screens beat this.",
+   hardFor:["Slants","Shallow Cross","RPO Alert Bubble","Bubble Screen"],
+   goodFor:["Four Verticals","Cheat Clearout Seam","Mesh Dagger"]},
+  {name:"Zero Blitz",short:"ZERO",color:"#e85547",
+   tells:["No safeties deep","5+ rushers showing","All corners in press"],
+   defenseVs:{RUN:"medium",PASS:"very hard",RPO:"light",PA:"light"},
+   description:"All-out blitz, no safety. Ball out in 1 second or you take a sack. Big play if you're right.",
+   hardFor:["Four Verticals","Slants","Bubble Screen","Quick Unders","QB Draw"],
+   goodFor:["Any slow developing pass","Any play with long protection"]}
+];
+
+// ═══════════════════════════════════════════════════════
+// FORMATION DIAGRAMS
+// Each formation: {off: [{lbl, pos}], def: {c2, c3, c4, man, c2m, zero}}
+// Positions: rows from top (defense) to bottom (offense)
+// ═══════════════════════════════════════════════════════
+const DIAGRAMS = {
+  // ── GUN FORMATIONS ──
+  // Format: [losRow] = WRs spread at ends, OL in middle — ALL on the line of scrimmage
+  //         [qbRow]  = QB in shotgun (5 yards back)
+  //         [hbRow]  = HB (if applicable)
+
+  "Trips TE": { losRow:[
+    {lbl:"Z",c:"off"},{lbl:"",c:"sp"},{lbl:"T",c:"off"},{lbl:"G",c:"off"},{lbl:"C",c:"off"},{lbl:"G",c:"off"},{lbl:"T",c:"off"},{lbl:"TE",c:"off"},{lbl:"Y",c:"off"},{lbl:"X",c:"off"}
+  ], qbRow:true, hbRow:true },
+
+  "Doubles Y Off": { losRow:[
+    {lbl:"X",c:"off"},{lbl:"",c:"sp"},{lbl:"T",c:"off"},{lbl:"G",c:"off"},{lbl:"C",c:"off"},{lbl:"G",c:"off"},{lbl:"T",c:"off"},{lbl:"",c:"sp"},{lbl:"Y",c:"off"},{lbl:"Z",c:"off"}
+  ], qbRow:true, hbRow:true },
+
+  "Bunch Str Offset": { losRow:[
+    {lbl:"X",c:"off"},{lbl:"",c:"sp"},{lbl:"T",c:"off"},{lbl:"G",c:"off"},{lbl:"C",c:"off"},{lbl:"G",c:"off"},{lbl:"T",c:"off"},{lbl:"Y",c:"off"},{lbl:"Z",c:"off"},{lbl:"SL",c:"off"}
+  ], qbRow:true, hbRow:true, hbOffset:"left" },
+
+  "Y Off Trips": { losRow:[
+    {lbl:"Y",c:"off"},{lbl:"",c:"sp"},{lbl:"T",c:"off"},{lbl:"G",c:"off"},{lbl:"C",c:"off"},{lbl:"G",c:"off"},{lbl:"T",c:"off"},{lbl:"SL",c:"off"},{lbl:"Z",c:"off"},{lbl:"X",c:"off"}
+  ], qbRow:true, hbRow:true },
+
+  "Bunch TE": { losRow:[
+    {lbl:"X",c:"off"},{lbl:"",c:"sp"},{lbl:"T",c:"off"},{lbl:"G",c:"off"},{lbl:"C",c:"off"},{lbl:"G",c:"off"},{lbl:"T",c:"off"},{lbl:"TE",c:"off"},{lbl:"Y",c:"off"},{lbl:"Z",c:"off"}
+  ], qbRow:true, hbRow:true },
+
+  "Normal Y Off Wk": { losRow:[
+    {lbl:"Z",c:"off"},{lbl:"",c:"sp"},{lbl:"T",c:"off"},{lbl:"G",c:"off"},{lbl:"C",c:"off"},{lbl:"G",c:"off"},{lbl:"T",c:"off"},{lbl:"",c:"sp"},{lbl:"Y",c:"off"},{lbl:"X",c:"off"}
+  ], qbRow:true, hbRow:true },
+
+  "Bunch Wide": { losRow:[
+    {lbl:"X",c:"off"},{lbl:"",c:"sp"},{lbl:"T",c:"off"},{lbl:"G",c:"off"},{lbl:"C",c:"off"},{lbl:"G",c:"off"},{lbl:"T",c:"off"},{lbl:"Y",c:"off"},{lbl:"Z",c:"off"},{lbl:"SL",c:"off"}
+  ], qbRow:true, hbRow:true },
+
+  "Wide Stack": { losRow:[
+    {lbl:"X",c:"off"},{lbl:"SL",c:"off"},{lbl:"T",c:"off"},{lbl:"G",c:"off"},{lbl:"C",c:"off"},{lbl:"G",c:"off"},{lbl:"T",c:"off"},{lbl:"",c:"sp"},{lbl:"Y",c:"off"},{lbl:"Z",c:"off"}
+  ], qbRow:true, hbRow:true },
+
+  "Trips X Nasty": { losRow:[
+    {lbl:"X",c:"off"},{lbl:"",c:"sp"},{lbl:"T",c:"off"},{lbl:"G",c:"off"},{lbl:"C",c:"off"},{lbl:"G",c:"off"},{lbl:"T",c:"off"},{lbl:"Y",c:"off"},{lbl:"SL",c:"off"},{lbl:"Z",c:"off"}
+  ], qbRow:true, hbRow:true },
+
+  "Split Slot Offset": { losRow:[
+    {lbl:"X",c:"off"},{lbl:"SL",c:"off"},{lbl:"T",c:"off"},{lbl:"G",c:"off"},{lbl:"C",c:"off"},{lbl:"G",c:"off"},{lbl:"T",c:"off"},{lbl:"SR",c:"off"},{lbl:"Y",c:"off"},{lbl:"Z",c:"off"}
+  ], qbRow:true, hbRow:false, hbOffset:"left" },
+
+  "Empty Trey Flex": { losRow:[
+    {lbl:"Z",c:"off"},{lbl:"SL",c:"off"},{lbl:"T",c:"off"},{lbl:"G",c:"off"},{lbl:"C",c:"off"},{lbl:"G",c:"off"},{lbl:"T",c:"off"},{lbl:"Y",c:"off"},{lbl:"SR",c:"off"},{lbl:"X",c:"off"}
+  ], qbRow:true, hbRow:false },
+
+  "Empty Bunch": { losRow:[
+    {lbl:"X",c:"off"},{lbl:"",c:"sp"},{lbl:"T",c:"off"},{lbl:"G",c:"off"},{lbl:"C",c:"off"},{lbl:"G",c:"off"},{lbl:"T",c:"off"},{lbl:"Y",c:"off"},{lbl:"Z",c:"off"},{lbl:"SL",c:"off"}
+  ], qbRow:true, hbRow:false },
+
+  "U Off Trips": { losRow:[
+    {lbl:"X",c:"off"},{lbl:"U",c:"off"},{lbl:"T",c:"off"},{lbl:"G",c:"off"},{lbl:"C",c:"off"},{lbl:"G",c:"off"},{lbl:"T",c:"off"},{lbl:"Y",c:"off"},{lbl:"SL",c:"off"},{lbl:"Z",c:"off"}
+  ], qbRow:true, hbRow:true },
+
+  "Empty Tight Stack": { losRow:[
+    {lbl:"X",c:"off"},{lbl:"SL",c:"off"},{lbl:"T",c:"off"},{lbl:"G",c:"off"},{lbl:"C",c:"off"},{lbl:"G",c:"off"},{lbl:"T",c:"off"},{lbl:"SR",c:"off"},{lbl:"Y",c:"off"},{lbl:"Z",c:"off"}
+  ], qbRow:true, hbRow:false },
+
+  // ── PISTOL ──
+  "Strong Slot": { losRow:[
+    {lbl:"X",c:"off"},{lbl:"SL",c:"off"},{lbl:"T",c:"off"},{lbl:"G",c:"off"},{lbl:"C",c:"off"},{lbl:"G",c:"off"},{lbl:"T",c:"off"},{lbl:"",c:"sp"},{lbl:"Y",c:"off"},{lbl:"Z",c:"off"}
+  ], qbRow:true, hbRow:true, pistol:true },
+
+  // ── SINGLEBACK ──
+  "Y Trips": { losRow:[
+    {lbl:"X",c:"off"},{lbl:"",c:"sp"},{lbl:"T",c:"off"},{lbl:"G",c:"off"},{lbl:"C",c:"off"},{lbl:"G",c:"off"},{lbl:"T",c:"off"},{lbl:"Y",c:"off"},{lbl:"SL",c:"off"},{lbl:"Z",c:"off"}
+  ], qbRow:true, hbRow:true, underCenter:true },
+
+  "Ace": { losRow:[
+    {lbl:"X",c:"off"},{lbl:"",c:"sp"},{lbl:"T",c:"off"},{lbl:"G",c:"off"},{lbl:"C",c:"off"},{lbl:"G",c:"off"},{lbl:"T",c:"off"},{lbl:"TE",c:"off"},{lbl:"",c:"sp"},{lbl:"Z",c:"off"}
+  ], qbRow:true, hbRow:true, underCenter:true },
+
+  "Bunch Ace": { losRow:[
+    {lbl:"X",c:"off"},{lbl:"",c:"sp"},{lbl:"T",c:"off"},{lbl:"G",c:"off"},{lbl:"C",c:"off"},{lbl:"G",c:"off"},{lbl:"T",c:"off"},{lbl:"Y",c:"off"},{lbl:"Z",c:"off"},{lbl:"SL",c:"off"}
+  ], qbRow:true, hbRow:true, fbRow:true, underCenter:true },
+
+  // ── I-FORM ──
+  "Pro": { losRow:[
+    {lbl:"X",c:"off"},{lbl:"",c:"sp"},{lbl:"T",c:"off"},{lbl:"G",c:"off"},{lbl:"C",c:"off"},{lbl:"G",c:"off"},{lbl:"T",c:"off"},{lbl:"",c:"sp"},{lbl:"",c:"sp"},{lbl:"Z",c:"off"}
+  ], qbRow:true, fbRow:true, hbRow:true, underCenter:true },
+
+  "Slot": { losRow:[
+    {lbl:"X",c:"off"},{lbl:"SL",c:"off"},{lbl:"T",c:"off"},{lbl:"G",c:"off"},{lbl:"C",c:"off"},{lbl:"G",c:"off"},{lbl:"T",c:"off"},{lbl:"",c:"sp"},{lbl:"",c:"sp"},{lbl:"Z",c:"off"}
+  ], qbRow:true, fbRow:true, hbRow:true, underCenter:true },
+
+  // ── GOAL LINE ──
+  "Normal": { losRow:[
+    {lbl:"X",c:"off"},{lbl:"",c:"sp"},{lbl:"T",c:"off"},{lbl:"G",c:"off"},{lbl:"C",c:"off"},{lbl:"G",c:"off"},{lbl:"T",c:"off"},{lbl:"TE",c:"off"},{lbl:"",c:"sp"},{lbl:"Z",c:"off"}
+  ], qbRow:true, fbRow:true, hbRow:true, underCenter:true },
+
+  // ── DEFAULT FALLBACK ──
+  "DEFAULT": { losRow:[
+    {lbl:"X",c:"off"},{lbl:"",c:"sp"},{lbl:"T",c:"off"},{lbl:"G",c:"off"},{lbl:"C",c:"off"},{lbl:"G",c:"off"},{lbl:"T",c:"off"},{lbl:"",c:"sp"},{lbl:"Y",c:"off"},{lbl:"Z",c:"off"}
+  ], qbRow:true, hbRow:true }
+}
+
+// Defense rows by coverage (drawn above the offense)
+const DEF_ROWS = {
+  // Order: top row = deepest defenders, bottom row = DL (closest to LOS)
+  "Cover 2":[
+    [{lbl:"FS",c:"deep"},{lbl:"",c:"sp"},{lbl:"",c:"sp"},{lbl:"",c:"sp"},{lbl:"",c:"sp"},{lbl:"",c:"sp"},{lbl:"SS",c:"deep"}],
+    [{lbl:"CB",c:"zone"},{lbl:"",c:"sp"},{lbl:"LB",c:"zone"},{lbl:"",c:"sp"},{lbl:"LB",c:"zone"},{lbl:"",c:"sp"},{lbl:"CB",c:"zone"}],
+    [{lbl:"",c:"sp"},{lbl:"",c:"sp"},{lbl:"DE",c:"zone"},{lbl:"DT",c:"zone"},{lbl:"DT",c:"zone"},{lbl:"DE",c:"zone"},{lbl:"",c:"sp"}]
+  ],
+  "Cover 3":[
+    [{lbl:"CB",c:"deep"},{lbl:"",c:"sp"},{lbl:"",c:"sp"},{lbl:"FS",c:"deep"},{lbl:"",c:"sp"},{lbl:"",c:"sp"},{lbl:"CB",c:"deep"}],
+    [{lbl:"",c:"sp"},{lbl:"LB",c:"zone"},{lbl:"",c:"sp"},{lbl:"SS",c:"zone"},{lbl:"",c:"sp"},{lbl:"LB",c:"zone"},{lbl:"",c:"sp"}],
+    [{lbl:"",c:"sp"},{lbl:"",c:"sp"},{lbl:"DE",c:"zone"},{lbl:"DT",c:"zone"},{lbl:"DT",c:"zone"},{lbl:"DE",c:"zone"},{lbl:"",c:"sp"}]
+  ],
+  "Cover 4":[
+    [{lbl:"CB",c:"deep"},{lbl:"FS",c:"deep"},{lbl:"",c:"sp"},{lbl:"",c:"sp"},{lbl:"",c:"sp"},{lbl:"SS",c:"deep"},{lbl:"CB",c:"deep"}],
+    [{lbl:"",c:"sp"},{lbl:"",c:"sp"},{lbl:"LB",c:"zone"},{lbl:"",c:"sp"},{lbl:"LB",c:"zone"},{lbl:"",c:"sp"},{lbl:"",c:"sp"}],
+    [{lbl:"",c:"sp"},{lbl:"",c:"sp"},{lbl:"DE",c:"zone"},{lbl:"DT",c:"zone"},{lbl:"DT",c:"zone"},{lbl:"DE",c:"zone"},{lbl:"",c:"sp"}]
+  ],
+  "Man Coverage":[
+    [{lbl:"",c:"sp"},{lbl:"",c:"sp"},{lbl:"",c:"sp"},{lbl:"SS",c:"man"},{lbl:"",c:"sp"},{lbl:"",c:"sp"},{lbl:"",c:"sp"}],
+    [{lbl:"CB",c:"man"},{lbl:"",c:"sp"},{lbl:"LB",c:"man"},{lbl:"",c:"sp"},{lbl:"LB",c:"man"},{lbl:"",c:"sp"},{lbl:"CB",c:"man"}],
+    [{lbl:"",c:"sp"},{lbl:"",c:"sp"},{lbl:"DE",c:"man"},{lbl:"DT",c:"man"},{lbl:"DT",c:"man"},{lbl:"DE",c:"man"},{lbl:"",c:"sp"}]
+  ],
+  "Cover 2 Man":[
+    [{lbl:"FS",c:"deep"},{lbl:"",c:"sp"},{lbl:"",c:"sp"},{lbl:"",c:"sp"},{lbl:"",c:"sp"},{lbl:"",c:"sp"},{lbl:"SS",c:"deep"}],
+    [{lbl:"CB",c:"man"},{lbl:"",c:"sp"},{lbl:"LB",c:"man"},{lbl:"",c:"sp"},{lbl:"LB",c:"man"},{lbl:"",c:"sp"},{lbl:"CB",c:"man"}],
+    [{lbl:"",c:"sp"},{lbl:"",c:"sp"},{lbl:"DE",c:"man"},{lbl:"DT",c:"man"},{lbl:"DT",c:"man"},{lbl:"DE",c:"man"},{lbl:"",c:"sp"}]
+  ],
+  "Zero Blitz":[
+    [{lbl:"CB",c:"man"},{lbl:"",c:"sp"},{lbl:"LB",c:"man"},{lbl:"LB",c:"man"},{lbl:"LB",c:"man"},{lbl:"",c:"sp"},{lbl:"CB",c:"man"}],
+    [{lbl:"",c:"sp"},{lbl:"DE",c:"man"},{lbl:"LB",c:"man"},{lbl:"DT",c:"man"},{lbl:"DT",c:"man"},{lbl:"DE",c:"man"},{lbl:"",c:"sp"}]
+  ]
+}
+
+// ═══════════════════════════════════════════════════════
+// READ SCENARIOS — per play, per coverage
+// ═══════════════════════════════════════════════════════
+const READ_SCENARIOS = {
+  "Inside Zone":{
+    "Cover 2":{reaction:"The MIKE crashes the A gap hard on the snap. Your center cannot reach him in time.",prompt:"WHERE DO YOU HIT?",
+      options:[
+        {text:"Cut it behind the MIKE into the B gap",correct:true,yards:()=>rand(4,9),why:"The MIKE's crash opened the B gap. Good read — you hit the crease he left."},
+        {text:"Stay on the original A gap path",correct:false,yards:()=>rand(-1,2),why:"The MIKE crashed that gap. Running into his pursuit cost you yards."},
+        {text:"Bounce it outside",correct:false,yards:()=>rand(0,3),why:"Bouncing outside against a two-high shell puts you in front of extra defenders. Wrong decision."}
+      ]},
+    "Cover 3":{reaction:"The playside linebacker flows to the A gap. The backside B gap is wide open.",prompt:"WHERE DO YOU HIT?",
+      options:[
+        {text:"Cut backside into the open B gap",correct:true,yards:()=>rand(5,10),why:"You read the LB flow correctly and cut back. Cover 3 gives up the cutback lane."},
+        {text:"Stay playside",correct:false,yards:()=>rand(1,4),why:"The LB was waiting for you there. Backside was open but you didn't take it."},
+        {text:"Cut all the way outside",correct:false,yards:()=>rand(0,3),why:"The corner was in a deep third but the flat was open — not the right cut on zone."}
+      ]},
+    "Cover 4":{reaction:"Light box — only 5 defenders inside. Huge gaps on both sides of the center.",prompt:"WHAT DO YOU SEE?",
+      options:[
+        {text:"Press the A gap — 5 in the box, you have numbers",correct:true,yards:()=>rand(6,12),why:"Cover 4 = light box = free yards. You read the numbers right and got a big gain."},
+        {text:"Audible to a pass — Cover 4 means they want you to run",correct:false,yards:()=>rand(3,6),why:"Cover 4 is giving you the run. Staying with Inside Zone was the right call."},
+        {text:"Cut outside — light box means edge is open too",correct:false,yards:()=>rand(2,5),why:"The edge is open but the A gap is more direct. Numbers favored inside."}
+      ]},
+    "Man Coverage":{reaction:"Man coverage — every defender is attached to a receiver. The box has 6 defenders.",prompt:"WHERE DO YOU ATTACK?",
+      options:[
+        {text:"Run the play — man coverage doesn't add extra box defenders",correct:true,yards:()=>rand(4,8),why:"Man coverage means the same box count. Your blocking created a lane."},
+        {text:"Check to a pass — man means your receivers are open",correct:false,yards:()=>rand(2,5),why:"Run the ball against man — the RPO would have worked here but the straight run still got yards."},
+        {text:"Cut outside — man corners are occupied",correct:false,yards:()=>rand(1,4),why:"Man corners are on WRs but the edge defender is still there. Inside was better."}
+      ]},
+    "Cover 2 Man":{reaction:"Press man with two deep safeties. Box is loaded — 7 in the run fit.",prompt:"WHAT DO YOU DO?",
+      options:[
+        {text:"Run the play — you called Inside Zone for a reason",correct:false,yards:()=>rand(0,3),why:"Cover 2 Man adds an extra run defender. This is a tough run situation — should have audible'd to a quick pass."},
+        {text:"Check to RPO bubble — two safeties deep means perimeter is soft",correct:true,yards:()=>rand(6,11),why:"Cover 2 Man press corners run with receivers — the bubble behind them is open. Smart check."},
+        {text:"Sneak the ball — short yardage mentality",correct:false,yards:()=>rand(1,3),why:"7 in the box against a sneak is tough. The RPO was the right answer here."}
+      ]},
+    "Zero Blitz":{reaction:"Zero blitz — 6 rushers coming. Protection is outnumbered by 2.",prompt:"WHAT DO YOU DO?",
+      options:[
+        {text:"Run the play — blitz means light coverage outside",correct:true,yards:()=>rand(3,8),why:"Zero blitz removes coverage defenders. Running into the rush got you positive yards."},
+        {text:"Check to Four Verticals — no safety deep",correct:true,yards:()=>rand(10,20),why:"Zero blitz with no safety = vertical is a touchdown if you throw it immediately. Best answer."},
+        {text:"Hold the ball and wait for routes",correct:false,yards:()=>rand(-6,-2),why:"Zero blitz arrives in 1.5 seconds. Holding the ball means a sack."}
+      ]}
+  },
+  "Texas":{
+    "Cover 2":{reaction:"Both safeties split wide. MIKE drops at 8 yards. The A gap between the safeties is open.",prompt:"WHERE DO YOU THROW?",
+      options:[
+        {text:"HB angle route out of the backfield — MIKE dropped",correct:true,yards:()=>rand(6,11),why:"MIKE dropping opened the HB angle. Perfect read — Texas is designed for this."},
+        {text:"TE crossing route — he'll be open behind the LBs",correct:false,yards:()=>rand(3,6),why:"TE cross works too but MIKE is already dropping that direction. HB angle was cleaner."},
+        {text:"Wait for a deep route to develop",correct:false,yards:()=>rand(-4,-1),why:"Texas is a quick concept. Waiting for deep routes costs you the timing and likely a sack."}
+      ]},
+    "Cover 3":{reaction:"MIKE sits at 6 yards reading the HB. The TE is running a cross behind him.",prompt:"WHERE DO YOU GO?",
+      options:[
+        {text:"TE cross — MIKE is sitting on the HB angle",correct:true,yards:()=>rand(7,13),why:"MIKE taking the HB leaves the TE cross wide open behind him. Texas puts him in conflict — you read it correctly."},
+        {text:"HB angle — quick read",correct:false,yards:()=>rand(2,5),why:"MIKE was sitting on the HB. The TE cross was the better read here."},
+        {text:"Check down to the flat",correct:false,yards:()=>rand(2,4),why:"The flat was open but the TE cross was a bigger gain. Texas works because of the two-level conflict."}
+      ]},
+    "Cover 4":{reaction:"Light box. MIKE bails into a short zone at 5 yards. Both LBs are dropping.",prompt:"WHAT DO YOU SEE?",
+      options:[
+        {text:"HB angle — MIKE bailed, the underneath is wide open",correct:true,yards:()=>rand(8,14),why:"Cover 4 bails LBs into zone. The HB angle hits the massive void they left. Huge gain."},
+        {text:"Run the ball — Cover 4 is giving you the run",correct:false,yards:()=>rand(5,9),why:"Run was open too but you already called Texas. HB angle was the right pass read."},
+        {text:"TE deep seam — they're bailing into zone",correct:false,yards:()=>rand(3,7),why:"Safety is in the deep quarter. TE seam runs into coverage. HB angle was shorter and safer."}
+      ]},
+    "Man Coverage":{reaction:"MIKE is locked on the HB pre-snap in man coverage. He will run with him everywhere.",prompt:"WHAT DO YOU DO?",
+      options:[
+        {text:"HB angle — MIKE has to chase, can't keep up in space",correct:true,yards:()=>rand(8,14),why:"Man coverage LB on HB is an automatic mismatch in space. Throw it immediately and let him run."},
+        {text:"TE cross — TE vs LB is also a mismatch",correct:false,yards:()=>rand(5,9),why:"TE cross works in man too but you have to account for the safety. HB angle to space is cleaner."},
+        {text:"Hold and look for a deeper route",correct:false,yards:()=>rand(-4,1),why:"Man coverage with a safety means deep routes are covered. HB angle was the play."}
+      ]},
+    "Cover 2 Man":{reaction:"MIKE is pressed on the HB. Both safeties are deep. The ball needs to come out fast.",prompt:"WHAT DO YOU DO?",
+      options:[
+        {text:"HB angle — throw it before the rush arrives",correct:true,yards:()=>rand(6,10),why:"Cover 2 Man means you must throw quick. HB angle out before the rush is the right answer."},
+        {text:"Find the deeper route — safety is helping deep",correct:false,yards:()=>rand(-3,2),why:"Cover 2 Man rush arrives fast. Deep routes are also bracketed. Quick HB angle was correct."},
+        {text:"Check to bubble screen — perimeter is softer",correct:false,yards:()=>rand(4,8),why:"Bubble works too but you're already at the line of scrimmage in Texas. HB angle is the cleaner read."}
+      ]},
+    "Zero Blitz":{reaction:"Zero blitz — 6 coming. MIKE is rushing. No safety help anywhere.",prompt:"WHAT DO YOU DO?",
+      options:[
+        {text:"HB angle immediately — MIKE is rushing, not covering",correct:true,yards:()=>rand(10,18),why:"MIKE is blitzing, not covering the HB. Texas is a free big play against zero blitz — throw it right now."},
+        {text:"Look off to the deep route",correct:false,yards:()=>rand(-6,-2),why:"Zero blitz arrives in 1.5 seconds. Any hesitation means a sack."},
+        {text:"Throw away — too much pressure",correct:false,yards:()=>rand(0,0),why:"HB angle was open immediately. Throwing away cost you a big gain."}
+      ]}
+  },
+  "Four Verticals":{
+    "Cover 2":{reaction:"Both safeties split and each shade toward the outside receivers. The inside seams are uncovered.",prompt:"WHERE DO YOU THROW?",
+      options:[
+        {text:"Inside seam opposite where the safety shaded",correct:true,yards:()=>rand(15,25),why:"You identified the safety's shade and threw the opposite seam. Perfect Four Verticals read."},
+        {text:"Outside vertical — corner is in the flat",correct:false,yards:()=>rand(5,10),why:"Outside vertical against Cover 2 runs into the safety. Seam between them was the read."},
+        {text:"Wait for a crosser to open",correct:false,yards:()=>rand(-3,2),why:"Four Verticals doesn't have crossers. Holding the ball against Cover 2 rush means a sack."}
+      ]},
+    "Cover 3":{reaction:"Safety centers up. Both corners bail deep. The seam between the safety and the corner is open.",prompt:"WHERE DO YOU ATTACK?",
+      options:[
+        {text:"Slot receiver up the seam — safety can't cover both",correct:true,yards:()=>rand(18,30),why:"Cover 3 safety can only go to one seam. You identified which side was open. Big play."},
+        {text:"Outside vertical — corner bailed",correct:false,yards:()=>rand(6,12),why:"Corner bailed but is in deep-third coverage. Seam between safety and corner was the throw."},
+        {text:"Check down to the flat",correct:false,yards:()=>rand(3,7),why:"Four Verticals is a shot play. Checking down here wastes the concept."}
+      ]},
+    "Cover 4":{reaction:"Four defenders drop into quarters coverage. Every deep zone has a defender. The underneath is wide open.",prompt:"WHAT DO YOU SEE?",
+      options:[
+        {text:"Throw the seam — quarters corners can't overlap with safeties",correct:true,yards:()=>rand(12,22),why:"Quarters coverage creates seam voids between the corners' zones and the safeties' zones. Good eye."},
+        {text:"Run the ball — Cover 4 is giving you the run",correct:false,yards:()=>rand(5,10),why:"Run was open but you already called Four Verticals. Throw the seam — it's there."},
+        {text:"Wait for one receiver to break open",correct:false,yards:()=>rand(-2,4),why:"Waiting too long against quarters rush. The seam was open immediately."}
+      ]},
+    "Man Coverage":{reaction:"Every receiver is covered man-to-man. One safety in the box. No help over the top.",prompt:"WHAT DO YOU DO?",
+      options:[
+        {text:"Fire the vertical immediately — single coverage no safety",correct:true,yards:()=>rand(20,35),why:"Man with no safety = vertical is a touchdown. You threw it fast and your receiver beat his man. Big play."},
+        {text:"Look off the safety first",correct:false,yards:()=>rand(12,20),why:"No safety to look off — just throw it to the receiver winning his route. Still got yards but slower."},
+        {text:"Check down to a shorter route",correct:false,yards:()=>rand(3,7),why:"Man coverage with no safety is exactly what Four Verticals is designed to attack. Checking down wastes it."}
+      ]},
+    "Cover 2 Man":{reaction:"Man underneath with two deep safeties. Verticals run into the deep bracket.",prompt:"WHAT DO YOU DO?",
+      options:[
+        {text:"Throw the seam — safety must choose between two",correct:true,yards:()=>rand(10,18),why:"Even against Cover 2 Man, the seam between the two safeties is the void. Good read."},
+        {text:"Check to a quick slant — ball out before rush",correct:false,yards:()=>rand(6,10),why:"Slant works too but you called a shot play. The seam was open — try it."},
+        {text:"Hold and look for a route to separate",correct:false,yards:()=>rand(-4,-1),why:"Cover 2 Man rush is fast. Holding the ball means a sack."}
+      ]},
+    "Zero Blitz":{reaction:"Zero blitz — every defender is rushing or in man with no safety deep.",prompt:"WHAT DO YOU DO?",
+      options:[
+        {text:"Throw the vertical immediately — no safety deep",correct:true,yards:()=>rand(25,40),why:"Zero blitz with no safety = first vertical that separates is a touchdown. Ball out immediately. Great play."},
+        {text:"Take a quick check down",correct:false,yards:()=>rand(4,8),why:"Zero blitz with no safety is the exact situation Four Verticals destroys. Checking down wastes a TD."},
+        {text:"Hold the ball and let routes develop",correct:false,yards:()=>rand(-8,-3),why:"Zero blitz arrives in 1.5 seconds. You took the sack by holding."}
+      ]}
+  },
+  "Cheat Clearout Seam":{
+    "Cover 2":{reaction:"Both safeties squeeze toward the seam as the TE releases vertically.",prompt:"WHAT DO YOU DO?",
+      options:[
+        {text:"Throw the flat — safeties squeezed the seam",correct:true,yards:()=>rand(5,9),why:"You identified the safety squeeze and checked down to the flat. Good coverage read."},
+        {text:"Throw the TE seam anyway — take the shot",correct:false,yards:()=>rand(-2,3),why:"Both safeties bracketed the seam. The flat was the right read here."},
+        {text:"Wait for another route to open",correct:false,yards:()=>rand(-3,1),why:"Clearout Seam is a quick concept. Waiting too long cost you yards."}
+      ]},
+    "Cover 3":{reaction:"WILL linebacker widens with the trips clearout. The TE seam is uncovered up the hash.",prompt:"WHERE DO YOU THROW?",
+      options:[
+        {text:"TE seam — WILL went with the clearout",correct:true,yards:()=>rand(12,22),why:"WILL taking the clearout left the TE seam wide open. Perfect read — throw it before he recovers."},
+        {text:"Flat underneath — safe throw",correct:false,yards:()=>rand(3,6),why:"Flat was available but the seam was open for a much bigger gain. Miss."},
+        {text:"The outside receiver on the clearout",correct:false,yards:()=>rand(4,8),why:"The clearout receiver draws coverage — the TE behind him was the intended read."}
+      ]},
+    "Cover 4":{reaction:"Cover 4 has a safety over the seam. WILL widens with the clearout but safety helps.",prompt:"WHAT DO YOU DO?",
+      options:[
+        {text:"Check down to the flat — safety is over the seam",correct:true,yards:()=>rand(4,8),why:"Good read. Safety was sitting on the seam. Flat underneath was the right answer."},
+        {text:"Throw the seam — WILL went with the clearout",correct:false,yards:()=>rand(0,4),why:"The safety was over the seam — WILL leaving doesn't help when the safety is there."},
+        {text:"Run the ball instead",correct:false,yards:()=>rand(5,9),why:"Run was open with Cover 4's light box, but you already snapped. Check down to the flat."}
+      ]},
+    "Man Coverage":{reaction:"LB is assigned to the TE in man coverage. No safety help over the top.",prompt:"WHERE DO YOU THROW?",
+      options:[
+        {text:"TE seam immediately — LB cannot run with him",correct:true,yards:()=>rand(14,24),why:"Man LB on TE is the definition of a mismatch. Throw it the moment he clears — big play."},
+        {text:"Look for the outside receiver",correct:false,yards:()=>rand(5,9),why:"Outside receiver has his own man corner. TE vs. LB seam was the mismatch you designed this play for."},
+        {text:"Check down to the flat",correct:false,yards:()=>rand(3,6),why:"The TE seam was open against a LB in man. Checking down wasted a huge mismatch."}
+      ]},
+    "Cover 2 Man":{reaction:"LB is pressed on the TE. Two deep safeties are splitting the field.",prompt:"WHAT DO YOU DO?",
+      options:[
+        {text:"TE seam — throw before the rush arrives",correct:true,yards:()=>rand(10,18),why:"LB on TE in Cover 2 Man — throw it quick before the safeties can squeeze. Big gain."},
+        {text:"Look off a safety then throw the seam",correct:false,yards:()=>rand(6,12),why:"Looking off costs you time and the rush is coming. Throw the seam immediately in Cover 2 Man."},
+        {text:"Check to a quick screen — beat the rush",correct:false,yards:()=>rand(3,7),why:"Screen works but the TE seam was a bigger play. Trust the mismatch."}
+      ]},
+    "Zero Blitz":{reaction:"Zero blitz with man on the TE. No safety anywhere.",prompt:"WHAT DO YOU DO?",
+      options:[
+        {text:"TE seam immediately — LB is rushing, no safety",correct:true,yards:()=>rand(18,30),why:"Zero blitz means the LB is sometimes rushing, not covering the TE. And no safety deep. Throw it now."},
+        {text:"Check down — too much pressure",correct:false,yards:()=>rand(3,8),why:"TE seam against zero blitz is a free touchdown. The LB left to rush — his receiver is uncovered."},
+        {text:"Scramble for yards",correct:false,yards:()=>rand(2,7),why:"The TE seam was open immediately. Scrambling was the wrong decision."}
+      ]}
+  },
+  "RPO Alert Bubble":{
+    "Cover 2":{reaction:"LB steps toward the run. Corner is sitting at 5 yards on the bubble receiver.",prompt:"WHAT DO YOU DO?",
+      options:[
+        {text:"Give to the HB — corner is crashing on the bubble",correct:true,yards:()=>rand(4,8),why:"Corner was sitting on the bubble. Give is the right read when the perimeter is defended."},
+        {text:"Throw the bubble anyway",correct:false,yards:()=>rand(-1,2),why:"Corner was there — bubble goes for no yards or a loss. Give was the right read."},
+        {text:"Pull and keep",correct:false,yards:()=>rand(1,5),why:"LB stepped toward run but corner is on bubble. HB had the better angle — give was right."}
+      ]},
+    "Cover 3":{reaction:"LB steps toward the run. Corner bails into the deep third — nobody on the bubble.",prompt:"WHAT DO YOU DO?",
+      options:[
+        {text:"Pull and throw the bubble — corner bailed",correct:true,yards:()=>rand(8,15),why:"Corner bailing into Cover 3 left the bubble wide open. Perfect RPO read — big gain."},
+        {text:"Give to the HB",correct:false,yards:()=>rand(3,6),why:"LB stepped toward the run — give was okay, but the bubble was wide open for more yards."},
+        {text:"Pull and keep",correct:false,yards:()=>rand(2,5),why:"Bubble was open with nobody on it. Pull and throw was the right play."}
+      ]},
+    "Cover 4":{reaction:"Corner at 10 yards, LB steps toward the run. Bubble has nobody within 7 yards.",prompt:"WHAT DO YOU DO?",
+      options:[
+        {text:"Pull and throw bubble — Corner 4 corner is too deep",correct:true,yards:()=>rand(10,16),why:"Cover 4 corner is 10 yards off. Bubble is automatic. Throw it immediately — big gain."},
+        {text:"Give to the HB — light box means run",correct:false,yards:()=>rand(5,9),why:"HB run was open too with Cover 4's light box, but the bubble was even bigger yards."},
+        {text:"Pull and keep",correct:false,yards:()=>rand(3,7),why:"Bubble was more open than the keep lane. Pull and throw was bigger."}
+      ]},
+    "Man Coverage":{reaction:"LB steps toward run. Corner is man-pressed on the bubble receiver in his face.",prompt:"WHAT DO YOU DO?",
+      options:[
+        {text:"Give to the HB — corner is pressed on bubble",correct:true,yards:()=>rand(4,9),why:"Man corner pressed on the bubble means the bubble is contested. Give to HB was right."},
+        {text:"Pull and throw bubble into the corner's face",correct:false,yards:()=>rand(-2,2),why:"Pressed corner contests the bubble immediately. Give was the correct read."},
+        {text:"Pull and keep",correct:false,yards:()=>rand(2,6),why:"Give was safer with the pressed corner. HB had room to run."}
+      ]},
+    "Cover 2 Man":{reaction:"LB steps toward run. Corner pressed on bubble but two safeties are deep.",prompt:"WHAT DO YOU DO?",
+      options:[
+        {text:"Give to the HB — pressed corner negates the bubble",correct:true,yards:()=>rand(3,7),why:"Cover 2 Man corner is pressed — bubble is covered. Give was right."},
+        {text:"Pull and throw bubble — safeties are deep",correct:false,yards:()=>rand(1,4),why:"The corner was pressed on the bubble receiver — safeties being deep doesn't help here."},
+        {text:"Pull and find a different receiver",correct:false,yards:()=>rand(2,5),why:"HB was open — give was the right answer in Cover 2 Man against a pressed corner."}
+      ]},
+    "Zero Blitz":{reaction:"LB steps toward run then rushes. Corner blitzes too — nobody on the bubble.",prompt:"WHAT DO YOU DO?",
+      options:[
+        {text:"Pull and throw bubble — everyone is rushing",correct:true,yards:()=>rand(12,20),why:"Zero blitz removed the corner from coverage. Bubble with no defender is a massive gain."},
+        {text:"Give to the HB — too much chaos",correct:false,yards:()=>rand(0,3),why:"Blitz created a numbers disadvantage in the box. Pull and bubble was the right answer."},
+        {text:"Pull and keep — everybody is rushing inside",correct:false,yards:()=>rand(2,6),why:"Bubble was completely open with the corner blitzing. Throw it — bigger play than the keep."}
+      ]}
+  },
+  "Power O":{
+    "Cover 2":{reaction:"MIKE fills the A gap. Pulling guard has a clear path to the B gap and second level.",prompt:"WHERE DO YOU HIT?",
+      options:[
+        {text:"Follow the pulling guard to the B gap",correct:true,yards:()=>rand(5,10),why:"Pulling guard created the lane. Following him was the right decision — textbook Power O."},
+        {text:"Cut back behind the center",correct:false,yards:()=>rand(2,5),why:"Guard's lane was open. Cutting back prematurely cost you yards."},
+        {text:"Bounce outside the guard",correct:false,yards:()=>rand(1,3),why:"Guard had a lane. Bouncing outside runs into extra defenders."}
+      ]},
+    "Cover 3":{reaction:"MIKE drops into a hook zone. Pulling guard leads into an open B gap.",prompt:"WHERE DO YOU HIT?",
+      options:[
+        {text:"Follow the guard — B gap is wide open",correct:true,yards:()=>rand(6,12),why:"MIKE dropped in Cover 3, leaving the B gap undefended. Pulled guard had a free lane."},
+        {text:"Cut outside — MIKE dropped inside",correct:false,yards:()=>rand(3,6),why:"Corner and safety still outside. Following the guard was the bigger lane."},
+        {text:"Hit the A gap — MIKE vacated it",correct:false,yards:()=>rand(4,7),why:"Guard's B gap was actually cleaner. Both were options but the pull created the bigger lane."}
+      ]},
+    "Cover 4":{reaction:"Only 5 defenders in the box. Pulling guard has the second level all to himself.",prompt:"WHAT DO YOU SEE?",
+      options:[
+        {text:"Follow the guard — 5 in the box is a mismatch",correct:true,yards:()=>rand(7,14),why:"Cover 4's light box gave your pulling guard a free run to the second level. Big gain."},
+        {text:"Cut outside — corner is far off the ball",correct:false,yards:()=>rand(4,8),why:"Guard's lane was the biggest opening. Corner being off was irrelevant with 5 in the box."},
+        {text:"Check to a pass pre-snap — Cover 4 gives you bubble",correct:false,yards:()=>rand(5,8),why:"Bubble was open but you already snapped. Following the guard was right."}
+      ]},
+    "Man Coverage":{reaction:"MIKE is man-locked on the HB. He reads the pull and flows to the B gap.",prompt:"WHERE DO YOU HIT?",
+      options:[
+        {text:"Follow the guard — MIKE is attached and moving with you",correct:true,yards:()=>rand(4,8),why:"Man MIKE follows the HB, which means he is where your guard is going. Guard blocks him — gain."},
+        {text:"Cut away from the guard — MIKE is following you",correct:false,yards:()=>rand(1,4),why:"Guard's block accounts for the MIKE. Cutting away loses the block advantage."},
+        {text:"Hit the A gap before MIKE can react",correct:false,yards:()=>rand(2,5),why:"MIKE is assigned to you man-to-man — he goes where you go. Follow the guard."}
+      ]},
+    "Cover 2 Man":{reaction:"MIKE is pressed on the HB. 7 defenders in the run fit.",prompt:"WHAT DO YOU DO?",
+      options:[
+        {text:"Run it — guard gets to the second level",correct:true,yards:()=>rand(3,7),why:"Power O with a pulling guard can crack a 7-man box if execution is clean. Marginal gain."},
+        {text:"Audible to a quick pass — too many in the box",correct:false,yards:()=>rand(6,11),why:"Cover 2 Man is a tough run situation. Quick pass was actually the better call here."},
+        {text:"Follow the guard and fight for yards",correct:false,yards:()=>rand(2,5),why:"Ran into an extra defender. Quick pass was better against Cover 2 Man's loaded box."}
+      ]},
+    "Zero Blitz":{reaction:"Zero blitz — 6 rushers. Protection is outnumbered. Guard gets washed inside.",prompt:"WHAT DO YOU DO?",
+      options:[
+        {text:"Run behind the guard — blitz creates natural lanes",correct:true,yards:()=>rand(2,6),why:"Zero blitz removed coverage defenders. Running into the blitz got you positive yards."},
+        {text:"Cut outside quickly — blitz is all inside",correct:true,yards:()=>rand(4,9),why:"Zero blitz concentrated inside. Cutting outside away from the rush was smart."},
+        {text:"Hold for a pass read",correct:false,yards:()=>rand(-5,-2),why:"Zero blitz arrives instantly on a run. Holding for a pass read means a tackle for loss."}
+      ]}
+  },
+  "DEFAULT":{
+    "Cover 2":{reaction:"Coverage is set. The key defender makes his choice at the snap.",prompt:"MAKE YOUR READ",
+      options:[
+        {text:"Take what the defense gives you — attack the void",correct:true,yards:()=>rand(5,10),why:"Good read. You attacked the coverage void."},
+        {text:"Force it to your first read regardless",correct:false,yards:()=>rand(1,4),why:"Defense took away your first read. You should have found the open window."},
+        {text:"Scramble for yards",correct:false,yards:()=>rand(2,5),why:"Scrambling was unnecessary — a receiver was open if you trusted your read."}
+      ]},
+    "Cover 3":{reaction:"Single high safety centered. Curl-flat defenders drop into zones.",prompt:"MAKE YOUR READ",
+      options:[
+        {text:"Find the void between curl-flat defender and safety",correct:true,yards:()=>rand(6,12),why:"You found the zone void. Good read against Cover 3."},
+        {text:"Force the ball into covered area",correct:false,yards:()=>rand(0,3),why:"Tried to force it into coverage. Find the zone window."},
+        {text:"Check down immediately",correct:false,yards:()=>rand(3,6),why:"Check down was safe but the intermediate window was open for more."}
+      ]},
+    "Cover 4":{reaction:"Four deep defenders. Light box. Underneath is wide open.",prompt:"MAKE YOUR READ",
+      options:[
+        {text:"Attack underneath — Cover 4 gives you the short game",correct:true,yards:()=>rand(7,13),why:"Cover 4 concedes the underneath. You took what was there."},
+        {text:"Try to push the ball deep",correct:false,yards:()=>rand(2,6),why:"Cover 4 protects deep zones. Underneath was the right attack."},
+        {text:"Run the ball — light box",correct:true,yards:()=>rand(5,10),why:"Cover 4 light box is always a run opportunity. Good read."}
+      ]},
+    "Man Coverage":{reaction:"Man-to-man across the board. Defenders following receivers everywhere.",prompt:"MAKE YOUR READ",
+      options:[
+        {text:"Find the mismatch and throw it immediately",correct:true,yards:()=>rand(8,15),why:"You found the mismatch and attacked it. Man coverage punishes that."},
+        {text:"Wait for separation",correct:false,yards:()=>rand(1,5),why:"Man coverage rush is too fast to wait. Throw it on time."},
+        {text:"Check down to the HB",correct:false,yards:()=>rand(4,7),why:"HB was open but the WR mismatch was bigger. Trust your eyes."}
+      ]},
+    "Cover 2 Man":{reaction:"Press man with deep safeties. Rush is coming fast.",prompt:"MAKE YOUR READ",
+      options:[
+        {text:"Get the ball out quick — press man means rush",correct:true,yards:()=>rand(5,10),why:"Ball out fast against Cover 2 Man press. Good timing."},
+        {text:"Look for the deep route",correct:false,yards:()=>rand(-3,2),why:"Cover 2 Man has deep safeties. Deep routes are covered and rush arrives fast."},
+        {text:"Scramble — too much pressure",correct:false,yards:()=>rand(1,5),why:"Quick throw was open. Scrambling cost you the designed gain."}
+      ]},
+    "Zero Blitz":{reaction:"All-out blitz. Everyone rushing. No safety help anywhere.",prompt:"MAKE YOUR READ",
+      options:[
+        {text:"Ball out immediately — any receiver is open",correct:true,yards:()=>rand(10,20),why:"Zero blitz = someone is open. Ball out fast = big play."},
+        {text:"Wait for the route to develop",correct:false,yards:()=>rand(-7,-2),why:"Zero blitz arrives in 1.5 seconds. Sack."},
+        {text:"Throw it away — too much pressure",correct:false,yards:()=>rand(0,0),why:"Someone was open but you threw it away. Trust your quick read."}
+      ]}
+  }
+};
+
+// ═══════════════════════════════════════════════════════
+// COVERAGE SELECTION — picks hardest coverage for the play
+// ═══════════════════════════════════════════════════════
+function pickCoverage(play, type){
+  // Weight coverages that are hardest for this play type
+  const weights = {RUN:[2,3,1,2,3,1], PASS:[3,1,2,1,2,3], RPO:[1,2,2,2,1,3], PA:[3,1,2,1,2,2]};
+  const w = weights[type] || weights.PASS;
+  const total = w.reduce((a,b)=>a+b,0);
+  let r = Math.random()*total, cumul=0;
+  for(let i=0;i<COVERAGES.length;i++){
+    cumul+=w[i];
+    if(r<=cumul) return COVERAGES[i];
+  }
+  return COVERAGES[0];
+}
+
+function rand(min,max){return Math.floor(Math.random()*(max-min+1))+min;}
+
+// ═══════════════════════════════════════════════════════
+// DRIVE STATE
+// ═══════════════════════════════════════════════════════
+let state = {
+  down:1, dist:10, yardLine:25, side:"own",
+  score:{off:0,def:0},
+  plays:0, totalYards:0,
+  grades:{perfect:0,good:0,ok:0,miss:0},
+  driveLog:[],
+  currentPlay:null, currentCoverage:null, auditedPlay:false
+};
+
+const DOWN_LABELS = ["","1ST","2ND","3RD","4TH"];
+
+function updateScoreboard(){
+  document.getElementById("sbDown").textContent = DOWN_LABELS[state.down];
+  document.getElementById("sbDist").textContent = "& "+state.dist;
+  document.getElementById("sbPlays").textContent = state.plays;
+  document.getElementById("sbScore").textContent = state.score.off+" — "+state.score.def;
+  const totalGrades = state.grades.perfect+state.grades.good+state.grades.ok+state.grades.miss;
+  if(totalGrades>0){
+    const avg = (state.grades.perfect*4+state.grades.good*3+state.grades.ok*2+state.grades.miss)/totalGrades;
+    const labels={4:"A+",3.5:"A",3:"B+",2.5:"B",2:"C",1:"D"};
+    let grade="—";
+    for(const [k,v] of Object.entries(labels)){if(avg>=parseFloat(k)){grade=v;break;}}
+    document.getElementById("sbGrade").textContent = grade;
+  }
+  const pos = state.side==="own" ? "OWN "+state.yardLine : "OPP "+state.yardLine;
+  document.getElementById("sbFieldPos").textContent = pos;
+  document.getElementById("driveLog").textContent = state.driveLog.slice(-4).join(" · ") || "Select a situation to begin.";
+}
+
+function newDrive(){
+  state.down=1; state.dist=10;
+  state.yardLine=25; state.side="own";
+  state.plays=0; state.totalYards=0;
+  state.grades={perfect:0,good:0,ok:0,miss:0};
+  state.driveLog=[];
+  state.currentPlay=null; state.currentCoverage=null;
+  updateScoreboard();
+  goToPhase("phase-playcall");
+  renderSituations();
+}
+
+// ═══════════════════════════════════════════════════════
+// PHASE NAVIGATION
+// ═══════════════════════════════════════════════════════
+function goToPhase(id){
+  document.querySelectorAll(".phase").forEach(p=>p.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+  document.querySelector(".content").scrollTop=0;
+}
+
+// ═══════════════════════════════════════════════════════
+// PHASE 1: PLAY CALL
+// ═══════════════════════════════════════════════════════
+function renderSituations(){
+  const grid = document.getElementById("situationGrid");
+  grid.innerHTML="";
+  GAME_PLAN.forEach(sit=>{
+    const btn=document.createElement("button");
+    btn.className="sit-btn";
+    btn.innerHTML=`<div class="sit-btn-name">${sit.label}</div><div class="sit-btn-group">${sit.group}</div>`;
+    btn.style.borderLeft=`3px solid ${sit.color}`;
+    btn.onclick=()=>selectSituation(sit.id);
+    grid.appendChild(btn);
+  });
+  document.getElementById("playListWrap").style.display="none";
+  document.getElementById("playcallSub").textContent="Select a game plan situation, then pick your play.";
+}
+
+function selectSituation(id){
+  const sit = GAME_PLAN.find(s=>s.id===id);
+  document.querySelectorAll(".sit-btn").forEach(b=>{
+    b.classList.remove("active");
+    if(b.querySelector(".sit-btn-name").textContent===sit.label) b.classList.add("active");
+  });
+  document.getElementById("playcallSub").textContent=`${sit.label} — pick your play.`;
+  const wrap = document.getElementById("playListWrap");
+  const label = document.getElementById("playListLabel");
+  const list = document.getElementById("playList");
+  label.textContent=`${sit.label.toUpperCase()} PLAYS`;
+  list.innerHTML="";
+  sit.plays.forEach(p=>{
+    const el=document.createElement("div");
+    el.className="play-option";
+    el.innerHTML=`
+      <div style="flex:1">
+        <div class="play-option-name">${p.play}</div>
+        <div class="play-option-form">${p.set.toUpperCase()} · ${p.f.toUpperCase()}</div>
+      </div>
+      <span class="type-badge badge-${p.type}">${p.type}</span>`;
+    el.onclick=()=>selectPlay(p);
+    list.appendChild(el);
+  });
+  wrap.style.display="block";
+  wrap.scrollIntoView({behavior:"smooth",block:"nearest"});
+}
+
+function selectPlay(p){
+  state.currentPlay=p;
+  state.currentCoverage=pickCoverage(p.play,p.type);
+  state.auditedPlay=false;
+  buildPreSnap();
+  goToPhase("phase-presnap");
+}
+
+// ═══════════════════════════════════════════════════════
+// PHASE 2: PRE-SNAP
+// ═══════════════════════════════════════════════════════
+function buildPreSnap(){
+  const p=state.currentPlay, cov=state.currentCoverage;
+  // Play bar
+  document.getElementById("preSnapPlayBar").innerHTML=`
+    <div style="flex:1">
+      <div class="spb-name">${p.play}</div>
+      <div class="spb-form">${p.set.toUpperCase()} · ${p.f.toUpperCase()}</div>
+    </div>
+    <span class="type-badge badge-${p.type}">${p.type}</span>`;
+  // Diagram
+  buildDiagram("fieldDiagram", p.f, cov.name);
+  // Coverage banner
+  document.getElementById("coverageBanner").innerHTML=`
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+      <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--text3);letter-spacing:1.5px">DEFENSE SHOWING</div>
+    </div>
+    <div class="cov-banner-name" style="color:${cov.color}">${cov.name}</div>
+    <div style="font-size:12px;color:var(--text2);line-height:1.5;margin-top:4px">${cov.description}</div>
+    <div class="cov-banner-tells">${cov.tells.map(t=>`<span class="tell-chip">${t}</span>`).join("")}</div>`;
+  // Pre-snap note
+  const isGoodCov = cov.goodFor.includes(p.play);
+  const isHardCov = cov.hardFor.includes(p.play);
+  let note="";
+  if(isHardCov){
+    note=`<strong>⚠️ Tough coverage for this play.</strong> ${cov.name} takes away what ${p.play} wants to do. Consider an audible to a better call, or execute your check-down read.`;
+  } else if(isGoodCov){
+    note=`<strong>✅ This play attacks ${cov.name}.</strong> You are in a good matchup. Trust your primary read and execute — this is a favorable look.`;
+  } else {
+    note=`<strong>📋 Neutral matchup.</strong> ${p.play} can work against ${cov.name}. Read your key defender and take what they give you.`;
+  }
+  document.getElementById("preSnapNote").innerHTML=note;
+}
+
+function buildDiagram(elId, formation, covName){
+  const el = document.getElementById(elId);
+  const d = DIAGRAMS[formation] || DIAGRAMS["DEFAULT"];
+  const defRows = DEF_ROWS[covName] || DEF_ROWS["Cover 3"];
+
+  // CSS classes for player types
+  const clsMap = {
+    off:"off", deep:"def-deep", zone:"def-zone", man:"def-man", sp:"spacer"
+  };
+
+  const renderPlayer = (p) => {
+    const isOff = p.c === "off";
+    const isDef = ["deep","zone","man"].includes(p.c);
+    if(p.c === "sp" || !p.lbl){
+      return `<div class="player" style="visibility:hidden"><div class="player-icon"></div></div>`;
+    }
+    return `<div class="player"><div class="player-icon ${clsMap[p.c]||p.c}">${p.lbl}</div></div>`;
+  };
+
+  const renderRow = (players, extraStyle="") => {
+    let h = `<div class="player-row" style="${extraStyle}">`;
+    players.forEach(p => { h += renderPlayer(p); });
+    h += `</div>`;
+    return h;
+  };
+
+  let html = `<div class="field-grass"></div><div class="formation-layer">`;
+
+  // ── DEFENSE (top = deep, bottom = DL at LOS) ──
+  defRows.forEach((row, i) => {
+    const isDeep = i === 0;
+    const isDL = i === defRows.length - 1;
+    html += renderRow(row, isDL ? "margin-bottom:2px" : isDeep ? "opacity:0.85" : "");
+  });
+
+  // ── LINE OF SCRIMMAGE ──
+  html += `<div style="display:flex;align-items:center;padding:0 8px;margin:4px 0">
+    <div style="flex:1;height:2px;background:rgba(232,197,71,.6)"></div>
+    <div style="font-family:'DM Mono',monospace;font-size:8px;color:rgba(232,197,71,.8);padding:0 6px;letter-spacing:2px">LOS</div>
+    <div style="flex:1;height:2px;background:rgba(232,197,71,.6)"></div>
+  </div>`;
+
+  // ── OFFENSE LOS ROW (OL + WRs all on the line) ──
+  html += renderRow(d.losRow, "margin-top:2px");
+
+  // ── QB ROW ──
+  if(d.qbRow){
+    const qbCenter = d.underCenter
+      ? [{lbl:"QB",c:"off"}]
+      : [{lbl:"",c:"sp"},{lbl:"",c:"sp"},{lbl:"",c:"sp"},{lbl:"QB",c:"off"},{lbl:"",c:"sp"},{lbl:"",c:"sp"},{lbl:"",c:"sp"}];
+    html += renderRow(qbCenter, "margin-top:4px");
+  }
+
+  // ── FB ROW (I-Form / GL) ──
+  if(d.fbRow){
+    const fb = [{lbl:"",c:"sp"},{lbl:"",c:"sp"},{lbl:"",c:"sp"},{lbl:"FB",c:"off"},{lbl:"",c:"sp"},{lbl:"",c:"sp"},{lbl:"",c:"sp"}];
+    html += renderRow(fb);
+  }
+
+  // ── HB ROW ──
+  if(d.hbRow){
+    const hb = d.pistol
+      ? [{lbl:"",c:"sp"},{lbl:"",c:"sp"},{lbl:"HB",c:"off"},{lbl:"",c:"sp"},{lbl:"",c:"sp"},{lbl:"",c:"sp"},{lbl:"",c:"sp"}]
+      : [{lbl:"",c:"sp"},{lbl:"",c:"sp"},{lbl:"",c:"sp"},{lbl:"HB",c:"off"},{lbl:"",c:"sp"},{lbl:"",c:"sp"},{lbl:"",c:"sp"}];
+    html += renderRow(hb);
+  }
+
+  html += `</div>`;
+  el.innerHTML = html;
+}
+
+// ═══════════════════════════════════════════════════════
+// PHASE 3: AUDIBLE
+// ═══════════════════════════════════════════════════════
+function goToAudible(){
+  const cov=state.currentCoverage;
+  document.getElementById("audibleSub").textContent=`Defense is in ${cov.name}. Pick your audible.`;
+  document.getElementById("audibleCovBanner").innerHTML=`
+    <div class="cov-banner-name" style="color:${cov.color}">${cov.name}</div>
+    <div style="font-size:12px;color:var(--text2);margin-top:4px">${cov.description}</div>`;
+  // Find good audibles vs this coverage from the current situation
+  const sit = GAME_PLAN.find(s=>s.plays.some(p=>p.play===state.currentPlay.play));
+  const sitPlays = sit ? sit.plays : GAME_PLAN[0].plays;
+  const goodPlays = sitPlays.filter(p=>cov.goodFor.includes(p.play)&&p.play!==state.currentPlay.play);
+  const displayPlays = goodPlays.length>0 ? goodPlays.slice(0,4) : sitPlays.filter(p=>p.play!==state.currentPlay.play).slice(0,4);
+  const list=document.getElementById("audibleList");
+  list.innerHTML="";
+  displayPlays.forEach(p=>{
+    const isGood=cov.goodFor.includes(p.play);
+    const el=document.createElement("div");
+    el.className="audible-play";
+    el.innerHTML=`
+      <div class="audible-play-top">
+        <div style="flex:1;font-size:14px;font-weight:600;color:var(--text)">${p.play}</div>
+        <span class="type-badge badge-${p.type}">${p.type}</span>
+        ${isGood?`<span style="font-size:9px;font-family:'DM Mono',monospace;color:var(--green);letter-spacing:1px">✓ BEATS ${cov.short}</span>`:""}
+      </div>
+      <div style="font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;margin-bottom:4px">${p.set.toUpperCase()} · ${p.f.toUpperCase()}</div>
+      <div class="audible-why">${isGood?"This play attacks "+cov.name+" directly — good audible choice.":"Alternative option from your game plan."}</div>`;
+    el.onclick=()=>confirmAudible(p);
+    list.appendChild(el);
+  });
+  goToPhase("phase-audible");
+}
+
+function confirmAudible(p){
+  state.currentPlay=p;
+  state.auditedPlay=true;
+  buildPreSnap();
+  goToPhase("phase-presnap");
+}
+
+// ═══════════════════════════════════════════════════════
+// PHASE 4: POST-SNAP
+// ═══════════════════════════════════════════════════════
+function goToPostSnap(){
+  const p=state.currentPlay, cov=state.currentCoverage;
+  // Play bar
+  document.getElementById("postSnapPlayBar").innerHTML=`
+    <div style="flex:1">
+      <div class="spb-name">${p.play}${state.auditedPlay?" <span style='font-size:9px;color:var(--green);font-family:DM Mono,monospace;letter-spacing:1px'>AUDIBLE</span>":""}</div>
+      <div class="spb-form">${p.set.toUpperCase()} · ${p.f.toUpperCase()}</div>
+    </div>
+    <span class="type-badge badge-${p.type}">${p.type}</span>`;
+  // Diagram with slightly shifted defenders
+  buildDiagram("postSnapDiagram", p.f, cov.name);
+  // Read scenario
+  const scenario = READ_SCENARIOS[p.play]?.[cov.name]
+    || READ_SCENARIOS[p.play]?.["Cover 3"]
+    || READ_SCENARIOS["DEFAULT"]?.[cov.name]
+    || READ_SCENARIOS["DEFAULT"]["Cover 3"];
+  document.getElementById("defenderReacts").innerHTML=`<strong>⚡ SNAP — </strong>${scenario.reaction}`;
+  document.getElementById("readPrompt").textContent=scenario.prompt;
+  const opts=document.getElementById("readOptions");
+  opts.innerHTML="";
+  // Shuffle options
+  const shuffled=[...scenario.options].sort(()=>Math.random()-.5);
+  shuffled.forEach(opt=>{
+    const el=document.createElement("div");
+    el.className="read-opt";
+    el.textContent=opt.text;
+    el.onclick=()=>resolveRead(opt,scenario);
+    opts.appendChild(el);
+  });
+  goToPhase("phase-postsnap");
+}
+
+// ═══════════════════════════════════════════════════════
+// PHASE 5: RESULT
+// ═══════════════════════════════════════════════════════
+function resolveRead(opt, scenario){
+  const yards=opt.yards();
+  const p=state.currentPlay, cov=state.currentCoverage;
+  const isAuditedGood=state.auditedPlay&&cov.goodFor.includes(p.play);
+  const isAuditedBad=state.auditedPlay&&cov.hardFor.includes(p.play);
+  // Grade
+  let grade,gradeClass,gradeLabel;
+  if(opt.correct&&yards>=8){grade=4;gradeClass="grade-perfect";gradeLabel="PERFECT READ";}
+  else if(opt.correct&&yards>=4){grade=3;gradeClass="grade-good";gradeLabel="GOOD READ";}
+  else if(opt.correct){grade=2;gradeClass="grade-ok";gradeLabel="CORRECT READ";}
+  else if(!opt.correct&&yards>=4){grade=2;gradeClass="grade-ok";gradeLabel="LUCKY YARDS";}
+  else{grade=1;gradeClass="grade-miss";gradeLabel="MISSED READ";}
+  if(isAuditedGood&&opt.correct) grade=Math.min(4,grade+1);
+  if(isAuditedBad) grade=Math.max(1,grade-1);
+  // Update grade map
+  const gmap={4:"perfect",3:"good",2:"ok",1:"miss"};
+  state.grades[gmap[grade]]++;
+  // Update state
+  state.plays++;
+  state.totalYards+=yards;
+  // Advance field position
+  let newYard = state.yardLine + yards;
+  let newSide = state.side;
+  if(newYard>=100){
+    // Touchdown!
+    state.score.off+=7;
+    state.driveLog.push(`TD! +${yards}yds`);
+    updateScoreboard();
+    showDriveComplete("TOUCHDOWN!","🏆",yards);
+    return;
+  }
+  if(newYard>50){newSide="opp";newYard=100-newYard;}
+  state.yardLine=newYard; state.side=newSide;
+  // Down/distance
+  const newDist = state.dist - yards;
+  if(newDist<=0){
+    state.down=1; state.dist=10;
+    state.driveLog.push(`1st&10 +${yards}yds`);
+  } else {
+    state.down++;
+    state.dist=newDist;
+    state.driveLog.push(`${DOWN_LABELS[state.down]}&${state.dist} +${yards}yds`);
+  }
+  if(state.down>4){
+    // Turnover on downs
+    state.driveLog.push("TURNOVER ON DOWNS");
+    updateScoreboard();
+    showDriveComplete("TURNOVER ON DOWNS","😤",yards);
+    return;
+  }
+  updateScoreboard();
+  // Show result
+  const yardsEl=document.getElementById("resultYards");
+  yardsEl.textContent=(yards>=0?"+":"")+yards+" YDS";
+  yardsEl.className="result-yards "+(yards>=5?"positive":yards>=1?"zero":"negative");
+  document.getElementById("resultGrade").innerHTML=`<span class="grade-badge ${gradeClass}">${gradeLabel}</span>`;
+  let explanation=opt.why;
+  if(isAuditedGood) explanation+=" <strong>Bonus: your audible put you in a favorable matchup.</strong>";
+  if(isAuditedBad) explanation+=" <strong>Note: your audible didn't improve the matchup — keep shopping for a better look.</strong>";
+  document.getElementById("resultExplanation").innerHTML=explanation;
+  document.getElementById("resultNextState").innerHTML=`
+    <div>
+      <div class="next-state-down">${DOWN_LABELS[state.down]} & ${state.dist}</div>
+      <div style="font-size:11px;color:var(--text2);margin-top:2px">Next down</div>
+    </div>
+    <div class="next-state-detail">
+      <div style="font-size:13px;font-weight:600;color:var(--text)">${state.side==="own"?"OWN":"OPP"} ${state.yardLine}</div>
+      <div style="font-size:11px;color:var(--text2)">${state.totalYards} total yards · Play ${state.plays}</div>
+    </div>`;
+  goToPhase("phase-result");
+}
+
+function showDriveComplete(title,emoji,lastYards){
+  const totalReps=state.grades.perfect+state.grades.good+state.grades.ok+state.grades.miss;
+  document.getElementById("dcEmoji").textContent=emoji;
+  document.getElementById("dcResult").textContent=title;
+  document.getElementById("dcSub").textContent=`${state.plays} plays · ${state.totalYards} yards`;
+  document.getElementById("dcStats").innerHTML=`
+    <div class="dc-stat-row"><span class="dc-stat-lbl">Plays run</span><span class="dc-stat-val">${state.plays}</span></div>
+    <div class="dc-stat-row"><span class="dc-stat-lbl">Total yards</span><span class="dc-stat-val">${state.totalYards}</span></div>
+    <div class="dc-stat-row"><span class="dc-stat-lbl">Perfect reads</span><span class="dc-stat-val" style="color:var(--green)">${state.grades.perfect}</span></div>
+    <div class="dc-stat-row"><span class="dc-stat-lbl">Good reads</span><span class="dc-stat-val" style="color:var(--accent2)">${state.grades.good}</span></div>
+    <div class="dc-stat-row"><span class="dc-stat-lbl">Correct reads</span><span class="dc-stat-val" style="color:var(--accent)">${state.grades.ok}</span></div>
+    <div class="dc-stat-row"><span class="dc-stat-lbl">Missed reads</span><span class="dc-stat-val" style="color:var(--red)">${state.grades.miss}</span></div>
+    <div style="height:1px;background:var(--border);margin:8px 0"></div>
+    <div class="dc-stat-row"><span class="dc-stat-lbl">Score</span><span class="dc-stat-val">${state.score.off} — ${state.score.def}</span></div>`;
+  goToPhase("phase-drivecomplete");
+}
+
+function nextPlay(){
+  goToPhase("phase-playcall");
+  renderSituations();
+}
+
+// ── INIT ──
+updateScoreboard();
+renderSituations();
+</script>
+</body>
+</html>
