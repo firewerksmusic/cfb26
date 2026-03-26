@@ -2931,6 +2931,42 @@ const PLAY_DB = {
   covWorst: "Man coverage with press corners on both the slant and flat receivers.",
   covAdjust: "In tight press man, throw the slant before the corner can recover — ball out in 1 second."
 }
+,
+"Curl Flats": {
+  primary: "Watch the cornerbacks — curl routes settle at 10-12 yards while flat routes release outside. If the corner sits on the curl, throw the flat behind him. If he widens, throw the curl.",
+  secondary: "The curl-flat combination makes the corner wrong either way. Work near-to-far and throw to whichever level he vacates.",
+  covBest: "Cover 2 and Cover 4 — corners play the flat; curl sits behind them in the zone void.",
+  covWorst: "Cover 3 with a curl-flat defender shallow enough to take away both levels.",
+  covAdjust: "In Cover 3, throw the seam above the curl-flat defender — he can't cover both."
+},
+"Divide Wheel": {
+  primary: "Watch the flat defender — the divide route clears inside space while the wheel develops to the flat. If the flat defender crashes on the divide, throw the wheel behind him.",
+  secondary: "If the flat defender stays on the wheel, throw the divide settling inside — he gave up that zone.",
+  covBest: "Cover 3 — curl-flat defender must choose divide or wheel; one is always open.",
+  covWorst: "Cover 2 Man where the flat is taken and a safety brackets the wheel route.",
+  covAdjust: "In Cover 2 Man, hit the divide underneath — flat is covered but the divide sits in the seam void."
+},
+"H Trail Smash": {
+  primary: "Watch the cornerback — smash hitch underneath and H trail over the top. If the corner sits on the hitch, throw the H trail route over him immediately.",
+  secondary: "If the corner opens for the trail, throw the hitch — it's 5-7 yards and you take it.",
+  covBest: "Cover 2 and Cover 4 — corner faces a two-level conflict he cannot resolve.",
+  covWorst: "Cover 3 with a safety rotating over the trail route.",
+  covAdjust: "In Cover 3 with safety over the trail, throw the hitch — corner dropped and the hitch is open."
+},
+"Qb Crack Sweep": {
+  primary: "Watch the WR crack block — he handles the EMOL. QB reads the edge and follows the crack block to the perimeter. If the crack block seals the edge, turn up immediately.",
+  secondary: "If the edge defender fights through the crack, cut it back inside behind the crack block's body.",
+  covBest: "Cover 4 — deep corners can't affect the perimeter run before it develops.",
+  covWorst: "Cover 2 with a corner and safety both crashing on the sweep edge.",
+  covAdjust: "Against Cover 2 edge overload, cut it up inside immediately — the interior is soft."
+},
+"Y Curl": {
+  primary: "Watch the safety depth on the Y receiver's side — the Y curl settles at 10-12 yards in the intermediate void. If the safety is at 15+ yards, throw the curl when the Y plants and breaks.",
+  secondary: "If safety is shallow and breaks on the curl, throw it away and look for the seam behind the safety's rotation.",
+  covBest: "Cover 3 and Cover 4 — safeties retreat deep; curl hits in the void they vacate.",
+  covWorst: "Cover 2 with a safety sitting directly over the curl route landing spot.",
+  covAdjust: "In Cover 2 with safety over the curl, look for the dig or seam — the safety just vacated that zone."
+}
 };
 const SITUATIONS = [
   {id:'first_down',label:'1ST DOWN',color:'#52d48a',group:'STANDARD DOWNS',
@@ -2950,7 +2986,9 @@ const SITUATIONS = [
     {set:'SINGLEBACK',f:'Y Trips',play:'Inside Zone',type:'RUN',stars:1},
     {set:'GUN',f:'Trips TE',play:'Slants',type:'PASS',stars:1},
     {set:'GUN',f:'Bunch TE',play:'Mesh',type:'PASS',stars:1},
-    {set:'GUN',f:'Y Off Trips Nasty',play:'Inside Zone',type:'RUN',stars:1}
+    {set:'GUN',f:'Y Off Trips Nasty',play:'Inside Zone',type:'RUN',stars:1},
+    {set:'GUN',f:'Bunch Quads Offset',play:'Inside Zone',type:'RUN',stars:2},
+    {set:'SINGLEBACK',f:'Y Trips',play:'Hb Power Alert Bubble',type:'RPO',stars:2}
    ]},
   {id:'second_long',label:'2ND AND LONG (8+)',color:'#e85547',group:'STANDARD DOWNS',
    desc:'Move chains with quick game and screens. Avoid sacks. Get to a manageable 3rd down.',
@@ -2967,9 +3005,11 @@ const SITUATIONS = [
     {set:'GUN',f:'Trips TE Offset Wk',play:'Verticals',type:'PASS',stars:2},
     {set:'GUN',f:'Empty Quads HB',play:'Strong Flood',type:'PASS',stars:1},
     {set:'GUN',f:'Trips X Nasty',play:'Hi Lo Cross',type:'PASS',stars:1},
-    {set:'GUN',f:'Doubles Y Off',play:'Z Shallow Cross',type:'PASS',stars:1},
     {set:'GUN',f:'Bunch Wide',play:'Mesh Dagger',type:'PASS',stars:1},
-    {set:'PISTOL',f:'Doubles Y Off',play:'Fade Smash',type:'PASS',stars:1}
+    {set:'PISTOL',f:'Doubles Y Off',play:'Fade Smash',type:'PASS',stars:1},
+    {set:'GUN',f:'Trips X Nasty',play:'Hi Lo Dig',type:'PASS',stars:3},
+    {set:'PISTOL',f:'U Off Trips',play:'Te Cross',type:'PASS',stars:2},
+    {set:'GUN',f:'Y Off Trips Nasty',play:'Dagger Whip',type:'PASS',stars:2}
    ]},
   {id:'second_med',label:'2ND AND MED (4-7)',color:'#e8c547',group:'STANDARD DOWNS',
    desc:'RPO-heavy. Force the LB to declare run or pass. Attack what they give you.',
@@ -2983,12 +3023,14 @@ const SITUATIONS = [
     {set:'PISTOL',f:'Strong Slot',play:'Zone Fake Jet',type:'RUN',stars:2},
     {set:'GUN',f:'Bunch Str Offset',play:'Inside Zone',type:'RUN',stars:2},
     {set:'GUN',f:'Y Off Trips',play:'Hb Draw',type:'RUN',stars:2},
-    {set:'GUN',f:'Trips TE Offset Wk',play:'Rpo Read Bubble',type:'RPO',stars:2},
     {set:'GUN',f:'Doubles Y Off',play:'Jet Touch Pass',type:'PASS',stars:1},
     {set:'GUN',f:'Bunch TE',play:'Mtn Hb Swing',type:'PASS',stars:1},
     {set:'SINGLEBACK',f:'Bunch Ace',play:'Spacing',type:'PASS',stars:1},
     {set:'GUN',f:'Trips X Nasty',play:'Quick Unders',type:'PASS',stars:1},
-    {set:'I FORM',f:'Pro',play:'Hb Stretch',type:'RUN',stars:1}
+    {set:'I FORM',f:'Pro',play:'Hb Stretch',type:'RUN',stars:1},
+    {set:'GUN',f:'Bunch Wide',play:'Mesh Spot',type:'PASS',stars:3},
+    {set:'SINGLEBACK',f:'Ace Slot',play:'Pa Ctr Waggle',type:'PA',stars:2},
+    {set:'PISTOL',f:'Doubles Y Off',play:'Jet Touch Pass',type:'PASS',stars:2}
    ]},
   {id:'second_short',label:'2ND AND SHORT (1-3)',color:'#52d48a',group:'STANDARD DOWNS',
    desc:'Get the first down. Run the ball. Power and option are your go-tos.',
@@ -2999,7 +3041,6 @@ const SITUATIONS = [
     {set:'I FORM',f:'Slot',play:'Hb Power O',type:'RUN',stars:3},
     {set:'GUN',f:'Bunch TE',play:'Escort Power Read Toss',type:'RUN',stars:2},
     {set:'PISTOL',f:'U Off Trips',play:'Strong Power',type:'RUN',stars:2},
-    {set:'GUN',f:'Y Off Trips',play:'Gt Counter',type:'RUN',stars:2},
     {set:'SINGLEBACK',f:'Bunch Ace',play:'Over Crack Toss',type:'RUN',stars:2},
     {set:'GUN',f:'Trips TE',play:'Speed Option',type:'RUN',stars:2},
     {set:'I FORM',f:'Pro',play:'Power O',type:'RUN',stars:2},
@@ -3007,7 +3048,10 @@ const SITUATIONS = [
     {set:'GUN',f:'Doubles Y Off',play:'Jet Counter Y',type:'RUN',stars:1},
     {set:'GUN',f:'Bunch Str Offset',play:'Crack Toss',type:'RUN',stars:1},
     {set:'SINGLEBACK',f:'Ace Slot',play:'Inside Zone',type:'RUN',stars:1},
-    {set:'GUN',f:'Bunch TE',play:'Inside Zone',type:'RUN',stars:1}
+    {set:'GUN',f:'Bunch TE',play:'Inside Zone',type:'RUN',stars:1},
+    {set:'PISTOL',f:'Strong Slot',play:'Power Option',type:'RUN',stars:3},
+    {set:'SINGLEBACK',f:'Bunch Ace',play:'Over Crack Toss',type:'RUN',stars:2},
+    {set:'GUN',f:'Trips TE',play:'Shuffle Te Screen',type:'PASS',stars:2}
    ]},
   {id:'third_long',label:'3RD AND LONG (8+)',color:'#e85547',group:'THIRD DOWN',
    desc:'Stress every level. Empty formations and crossing concepts. Convert or punt.',
@@ -3015,7 +3059,6 @@ const SITUATIONS = [
     {set:'GUN',f:'Empty Trey Flex',play:'Levels Switch',type:'PASS',stars:3},
     {set:'GUN',f:'Trips TE',play:'Double In Sail',type:'PASS',stars:3},
     {set:'GUN',f:'Empty Quads HB',play:'Inside Crosses',type:'PASS',stars:3},
-    {set:'GUN',f:'Trips TE',play:'Flood',type:'PASS',stars:3},
     {set:'GUN',f:'Bunch TE',play:'Whips',type:'PASS',stars:2},
     {set:'GUN',f:'Doubles Y Off',play:'Mesh',type:'PASS',stars:2},
     {set:'GUN',f:'Trips TE Offset Wk',play:'Verticals',type:'PASS',stars:2},
@@ -3026,12 +3069,16 @@ const SITUATIONS = [
     {set:'GUN',f:'Trips TE',play:'Texas',type:'PASS',stars:1},
     {set:'GUN',f:'Trips X Nasty',play:'Verticals X Shallow',type:'PASS',stars:1},
     {set:'PISTOL',f:'Doubles Y Off',play:'Fade Smash',type:'PASS',stars:1},
-    {set:'GUN',f:'Empty Quads HB',play:'Post Corner Up',type:'PASS',stars:1}
+    {set:'GUN',f:'Empty Quads HB',play:'Post Corner Up',type:'PASS',stars:1},
+    {set:'GUN',f:'Trips TE Offset Wk',play:'Return Pa Deep Sail',type:'PA',stars:3},
+    {set:'GUN',f:'Trips X Nasty',play:'Verticals X Shallow',type:'PASS',stars:2},
+    {set:'PISTOL',f:'Strong Slot Open',play:'Pa Flood',type:'PA',stars:2},
+    {set:'GUN',f:'Empty Bunch',play:'Spacing',type:'PASS',stars:2},
+    {set:'GUN',f:'Empty Bunch',play:'Divide Wheel',type:'PASS',stars:2}
    ]},
   {id:'third_med',label:'3RD AND MED (4-7)',color:'#e8c547',group:'THIRD DOWN',
    desc:'RPO screens and crossing routes. Get what the defense concedes.',
    plays:[
-    {set:'GUN',f:'Trips TE',play:'Rpo Zone Alert Slot Screen',type:'RPO',stars:3},
     {set:'GUN',f:'Bunch Str Offset',play:'Mtn Rpo Alert Swing',type:'RPO',stars:3},
     {set:'GUN',f:'Y Off Trips',play:'Te Mid Screen',type:'PASS',stars:3},
     {set:'GUN',f:'Trips TE',play:'Inside Cross',type:'PASS',stars:3},
@@ -3045,7 +3092,9 @@ const SITUATIONS = [
     {set:'GUN',f:'Trips TE',play:'Hb Slip Screen',type:'PASS',stars:1},
     {set:'GUN',f:'Doubles Y Off',play:'Jet Te Mid Screen',type:'PASS',stars:1},
     {set:'SINGLEBACK',f:'Ace Slot',play:'Pa Ctr Waggle',type:'PA',stars:1},
-    {set:'GUN',f:'Bunch Str Offset',play:'Spacing Switch',type:'PASS',stars:1}
+    {set:'GUN',f:'Bunch Str Offset',play:'Spacing Switch',type:'PASS',stars:1},
+    {set:'GUN',f:'Trips TE',play:'Texas',type:'PASS',stars:3},
+    {set:'PISTOL',f:'U Off Trips',play:'Stick',type:'PASS',stars:2}
    ]},
   {id:'third_short',label:'3RD AND SHORT (1-3)',color:'#52d48a',group:'THIRD DOWN',
    desc:'Run the ball, option reads, and quick RPOs. Get the first.',
@@ -3063,8 +3112,10 @@ const SITUATIONS = [
     {set:'PISTOL',f:'Train',play:'Triple Option',type:'RUN',stars:1},
     {set:'I FORM',f:'Pro',play:'Pa Boot',type:'PA',stars:1},
     {set:'GUN',f:'Trips TE',play:'Shuffle Te Screen',type:'PASS',stars:1},
-    {set:'GUN',f:'Bunch TE',play:'Stick',type:'PASS',stars:1},
-    {set:'SINGLEBACK',f:'Bunch Ace',play:'Quick Pitch',type:'RUN',stars:1}
+    {set:'SINGLEBACK',f:'Bunch Ace',play:'Quick Pitch',type:'RUN',stars:1},
+    {set:'SINGLEBACK',f:'Bunch Ace',play:'Over Hb Duo',type:'RUN',stars:3},
+    {set:'GUN',f:'Doubles Y Off',play:'Jet Hb Sweep',type:'RUN',stars:2},
+    {set:'PISTOL',f:'Doubles Y Off',play:'Rpo Alert Bubble',type:'RPO',stars:2}
    ]},
   {id:'fourth_long',label:'4TH AND LONG (8+)',color:'#e85547',group:'FOURTH DOWN',
    desc:'Shot play. Take your best deep concept and execute.',
@@ -3079,11 +3130,13 @@ const SITUATIONS = [
     {set:'GUN',f:'Doubles Y Off',play:'Mesh',type:'PASS',stars:2},
     {set:'GUN',f:'Trips X Nasty',play:'Verticals X Shallow',type:'PASS',stars:2},
     {set:'GUN',f:'Empty Trey Flex',play:'Four Vertical',type:'PASS',stars:2},
-    {set:'GUN',f:'Trips TE',play:'Texas',type:'PASS',stars:1},
     {set:'GUN',f:'Bunch Wide',play:'Mesh Dagger',type:'PASS',stars:1},
     {set:'GUN',f:'Trips TE Offset Wk',play:'Return Pa Deep Sail',type:'PA',stars:1},
     {set:'GUN',f:'Empty Quads HB',play:'Post Corner Up',type:'PASS',stars:1},
-    {set:'GUN',f:'Trips X Nasty',play:'Hi Lo Dig',type:'PASS',stars:1}
+    {set:'GUN',f:'Trips X Nasty',play:'Hi Lo Dig',type:'PASS',stars:1},
+    {set:'GUN',f:'Bunch TE',play:'Curl Flat Corner',type:'PASS',stars:3},
+    {set:'GUN',f:'Trips TE Offset Wk',play:'Return Post Curl',type:'PASS',stars:2},
+    {set:'GUN',f:'Bunch Wide',play:'Seam Divide',type:'PASS',stars:2}
    ]},
   {id:'fourth_med',label:'4TH AND MED (4-7)',color:'#e8c547',group:'FOURTH DOWN',
    desc:'Convert with your best intermediate concept.',
@@ -3095,14 +3148,16 @@ const SITUATIONS = [
     {set:'GUN',f:'Doubles Y Off',play:'Z Shallow Cross',type:'PASS',stars:2},
     {set:'GUN',f:'Bunch TE',play:'Mesh Dig',type:'PASS',stars:2},
     {set:'GUN',f:'Trips TE Offset Wk',play:'Middle Slant',type:'PASS',stars:2},
-    {set:'GUN',f:'Empty Trey Flex',play:'Smash',type:'PASS',stars:2},
     {set:'GUN',f:'Trips X Nasty',play:'Quick Short Post',type:'PASS',stars:2},
     {set:'GUN',f:'Y Off Trips',play:'Curls Slot Whip',type:'PASS',stars:2},
     {set:'GUN',f:'Bunch Str Offset',play:'Dagger',type:'PASS',stars:1},
     {set:'GUN',f:'Trips TE',play:'Shuffle Mtn Hb Swing',type:'PASS',stars:1},
     {set:'GUN',f:'Doubles Y Off',play:'Corner Strike',type:'PASS',stars:1},
     {set:'GUN',f:'Empty Trey Flex',play:'Rz Mtn Inside Smash',type:'PASS',stars:1},
-    {set:'GUN',f:'Bunch TE',play:'Te Corner',type:'PASS',stars:1}
+    {set:'GUN',f:'Bunch TE',play:'Te Corner',type:'PASS',stars:1},
+    {set:'GUN',f:'Bunch TE',play:'Mtn Te Hitch Hb Seam',type:'PASS',stars:3},
+    {set:'SINGLEBACK',f:'Y Trips',play:'Sluggo Seam',type:'PASS',stars:2},
+    {set:'PISTOL',f:'Strong Slot Open',play:'Mesh',type:'PASS',stars:2}
    ]},
   {id:'fourth_short',label:'4TH AND SHORT (1-3)',color:'#52d48a',group:'FOURTH DOWN',
    desc:'Win or go home. Max aggression.',
@@ -3111,7 +3166,6 @@ const SITUATIONS = [
     {set:'GUN',f:'Bunch Str Offset',play:'Duo',type:'RUN',stars:3},
     {set:'PISTOL',f:'Strong Slot',play:'Triple Option',type:'RUN',stars:3},
     {set:'GUN',f:'Y Off Trips',play:'Gt Counter',type:'RUN',stars:3},
-    {set:'GUN',f:'Bunch TE',play:'Escort Hb Split Zone',type:'RUN',stars:2},
     {set:'GUN',f:'Doubles Y Off',play:'Read Option',type:'RUN',stars:2},
     {set:'PISTOL',f:'U Off Trips',play:'Jet Lead Read Option',type:'RUN',stars:2},
     {set:'I FORM',f:'Slot',play:'Hb Power O',type:'RUN',stars:2},
@@ -3121,13 +3175,15 @@ const SITUATIONS = [
     {set:'GUN',f:'Bunch TE',play:'Stick',type:'PASS',stars:1},
     {set:'I FORM',f:'Pro',play:'Pa Scissors',type:'PA',stars:1},
     {set:'GUN',f:'Trips TE Offset Wk',play:'Hb Power',type:'RUN',stars:1},
-    {set:'SINGLEBACK',f:'Bunch Ace',play:'Quick Pitch',type:'RUN',stars:1}
+    {set:'SINGLEBACK',f:'Bunch Ace',play:'Quick Pitch',type:'RUN',stars:1},
+    {set:'SINGLEBACK',f:'U Off Trips',play:'Motion Power',type:'RUN',stars:3},
+    {set:'GUN',f:'Trips TE',play:'Qb Zone',type:'RUN',stars:2},
+    {set:'I FORM',f:'Pro',play:'Pa Boot',type:'PA',stars:2}
    ]},
   {id:'two_min',label:'2 MINUTE OFFENSE',color:'#4a9eff',group:'SPECIAL',
    desc:'Move fast. Get out of bounds. Quick game and screens.',
    plays:[
     {set:'GUN',f:'Trips TE',play:'Hb Slip Screen',type:'PASS',stars:3},
-    {set:'GUN',f:'Bunch TE',play:'Inside Cross',type:'PASS',stars:3},
     {set:'GUN',f:'Doubles Y Off',play:'Slants',type:'PASS',stars:3},
     {set:'GUN',f:'Trips TE',play:'Y Shallow Cross',type:'PASS',stars:3},
     {set:'GUN',f:'Empty Trey Flex',play:'Slot Slants',type:'PASS',stars:2},
@@ -3140,7 +3196,10 @@ const SITUATIONS = [
     {set:'GUN',f:'Doubles Y Off',play:'Jet Touch Pass',type:'PASS',stars:1},
     {set:'GUN',f:'Trips X Nasty',play:'Quick Unders',type:'PASS',stars:1},
     {set:'GUN',f:'Empty Quads HB',play:'Spacing',type:'PASS',stars:1},
-    {set:'GUN',f:'Trips TE',play:'Shuffle Mtn Hb Swing',type:'PASS',stars:1}
+    {set:'GUN',f:'Trips TE',play:'Shuffle Mtn Hb Swing',type:'PASS',stars:1},
+    {set:'GUN',f:'Empty Quads HB',play:'Four Vertical',type:'PASS',stars:3},
+    {set:'GUN',f:'Trips TE Offset Wk',play:'Middle Slant',type:'PASS',stars:2},
+    {set:'GUN',f:'Empty Bunch',play:'H Trail Smash',type:'PASS',stars:2}
    ]},
   {id:'red_zone',label:'RED ZONE (10-20 yds)',color:'#e85547',group:'SCORING',
    desc:'Score touchdowns. TE corner and double in sail are your money plays.',
@@ -3159,7 +3218,10 @@ const SITUATIONS = [
     {set:'GUN',f:'Trips TE',play:'Shuffle Te Screen',type:'PASS',stars:1},
     {set:'PISTOL',f:'Strong Slot',play:'Pa Power O',type:'PA',stars:1},
     {set:'GUN',f:'Bunch TE',play:'Mtn Pa Cross Switch',type:'PA',stars:1},
-    {set:'GUN',f:'Trips X Nasty',play:'Mtn Spot Y Corner',type:'PASS',stars:1}
+    {set:'PISTOL',f:'U Off Trips',play:'Pa Y Corner',type:'PA',stars:3},
+    {set:'GUN',f:'Bunch Str Offset',play:'Corner Strike',type:'PASS',stars:2},
+    {set:'PISTOL',f:'Strong Slot Open',play:'Pa Flood',type:'PA',stars:2},
+    {set:'GUN',f:'Empty Bunch',play:'Verticals',type:'PASS',stars:2}
    ]},
   {id:'rz_fringe',label:'RED ZONE FRINGE (20-35)',color:'#e8c547',group:'SCORING',
    desc:'Move into scoring range or take a shot. RPOs and run game.',
@@ -3175,10 +3237,12 @@ const SITUATIONS = [
     {set:'PISTOL',f:'U Off Trips',play:'Pa Y Corner',type:'PA',stars:2},
     {set:'GUN',f:'Trips TE Offset Wk',play:'Pa Flood',type:'PA',stars:2},
     {set:'GUN',f:'Doubles Y Off',play:'Corner Strike',type:'PASS',stars:1},
-    {set:'GUN',f:'Bunch TE',play:'Te Corner',type:'PASS',stars:1},
     {set:'GUN',f:'Y Off Trips',play:'Sprint Flood',type:'PASS',stars:1},
     {set:'PISTOL',f:'Strong Slot',play:'Fade Smash',type:'PASS',stars:1},
-    {set:'SINGLEBACK',f:'Bunch Ace',play:'Te Angle',type:'PASS',stars:1}
+    {set:'SINGLEBACK',f:'Bunch Ace',play:'Te Angle',type:'PASS',stars:1},
+    {set:'GUN',f:'Doubles Y Off',play:'Jet Power Read',type:'RUN',stars:3},
+    {set:'PISTOL',f:'Bunch TE',play:'Flood',type:'PASS',stars:2},
+    {set:'GUN',f:'Empty Trey Flex',play:'Rz Mtn Inside Smash',type:'PASS',stars:2}
    ]},
   {id:'goal_line',label:'GOAL LINE (run)',color:'#e8c547',group:'SCORING',
    desc:'Score from inside the 5. Power first, option second.',
@@ -3191,13 +3255,15 @@ const SITUATIONS = [
     {set:'PISTOL',f:'Train',play:'Power O',type:'RUN',stars:2},
     {set:'GOAL LINE',f:'Goal Line Normal',play:'Hb Counter Wk',type:'RUN',stars:2},
     {set:'PISTOL',f:'Train',play:'Power Option',type:'RUN',stars:2},
-    {set:'GOAL LINE',f:'Goal Line Normal',play:'Fb Dive',type:'RUN',stars:2},
     {set:'PISTOL',f:'Train',play:'Counter Stir',type:'RUN',stars:2},
     {set:'GOAL LINE',f:'Goal Line Normal',play:'Strong Toss',type:'RUN',stars:1},
     {set:'GOAL LINE',f:'Goal Line Normal',play:'Hb Zone',type:'RUN',stars:1},
     {set:'PISTOL',f:'Strong Slot',play:'Triple Option',type:'RUN',stars:1},
     {set:'I FORM',f:'Slot',play:'Hb Power O',type:'RUN',stars:1},
-    {set:'SINGLEBACK',f:'Bunch Ace',play:'Over Hb Duo',type:'RUN',stars:1}
+    {set:'SINGLEBACK',f:'Bunch Ace',play:'Over Hb Duo',type:'RUN',stars:1},
+    {set:'I FORM',f:'Slot',play:'Hb Power G',type:'RUN',stars:3},
+    {set:'PISTOL',f:'U Off Trips',play:'Strong Power',type:'RUN',stars:2},
+    {set:'SINGLEBACK',f:'Bunch Ace',play:'Over Hb Duo',type:'RUN',stars:2}
    ]},
   {id:'goal_line_pass',label:'GOAL LINE PASS',color:'#4a9eff',group:'SCORING',
    desc:'Score through the air inside the 5. PA boots and TE targets.',
@@ -3207,7 +3273,6 @@ const SITUATIONS = [
     {set:'PISTOL',f:'Train',play:'Pa Boot Wheel',type:'PA',stars:3},
     {set:'GOAL LINE',f:'Goal Line Normal',play:'Pa Waggle',type:'PA',stars:3},
     {set:'GOAL LINE',f:'Goal Line Normal',play:'Pa Spot',type:'PA',stars:2},
-    {set:'PISTOL',f:'Train',play:'Pa Short Te Post',type:'PA',stars:2},
     {set:'GOAL LINE',f:'Goal Line Normal',play:'Pa Sprint Hb Flat',type:'PA',stars:2},
     {set:'PISTOL',f:'Train',play:'Verticals',type:'PASS',stars:2},
     {set:'GUN',f:'Trips TE',play:'Te Corner',type:'PASS',stars:2},
@@ -3216,7 +3281,10 @@ const SITUATIONS = [
     {set:'GUN',f:'Trips TE',play:'Double In Sail',type:'PASS',stars:1},
     {set:'PISTOL',f:'Strong Slot',play:'Pa Boot Lt',type:'PA',stars:1},
     {set:'I FORM',f:'Pro',play:'Pa Scissors',type:'PA',stars:1},
-    {set:'GUN',f:'Trips TE Offset Wk',play:'Pa Flood',type:'PA',stars:1}
+    {set:'GUN',f:'Trips TE Offset Wk',play:'Pa Flood',type:'PA',stars:1},
+    {set:'GUN',f:'Bunch TE',play:'Te Corner',type:'PASS',stars:3},
+    {set:'I FORM',f:'Slot',play:'Pa Jet Sweep',type:'PA',stars:2},
+    {set:'PISTOL',f:'Strong Slot',play:'Triple Option',type:'RUN',stars:2}
    ]},
   {id:'hurry_up',label:'HURRY UP',color:'#4a9eff',group:'SPECIAL',
    desc:'No huddle. Keep defense on their heels. Quick game only.',
@@ -3235,7 +3303,11 @@ const SITUATIONS = [
     {set:'GUN',f:'Trips X Nasty',play:'Quick Unders',type:'PASS',stars:1},
     {set:'GUN',f:'Empty Quads HB',play:'Spacing',type:'PASS',stars:1},
     {set:'GUN',f:'Bunch TE',play:'Mesh',type:'PASS',stars:1},
-    {set:'GUN',f:'Trips TE',play:'Shuffle Mtn Hb Swing',type:'PASS',stars:1}
+    {set:'GUN',f:'Trips TE',play:'Shuffle Mtn Hb Swing',type:'PASS',stars:1},
+    {set:'GUN',f:'Trips TE Offset Wk',play:'Rpo Peek Slant',type:'RPO',stars:3},
+    {set:'GUN',f:'Trips X Nasty',play:'Quick Fork Zig',type:'PASS',stars:2},
+    {set:'GUN',f:'Bunch Wide',play:'Bubble Screen',type:'PASS',stars:2},
+    {set:'GUN',f:'Empty Bunch',play:'Spacing',type:'PASS',stars:2}
    ]},
   {id:'conserve',label:'CONSERVE CLOCK',color:'#52d48a',group:'SPECIAL',
    desc:'Run the clock. First downs on the ground. Force timeouts.',
@@ -3254,7 +3326,10 @@ const SITUATIONS = [
     {set:'GUN',f:'Trips TE',play:'Hb Slip Screen',type:'PASS',stars:1},
     {set:'I FORM',f:'Pro',play:'Pa Boot',type:'PA',stars:1},
     {set:'SINGLEBACK',f:'Bunch Ace',play:'Spacing',type:'PASS',stars:1},
-    {set:'PISTOL',f:'Bunch TE',play:'Flood',type:'PASS',stars:1}
+    {set:'PISTOL',f:'Bunch TE',play:'Flood',type:'PASS',stars:1},
+    {set:'I FORM',f:'Pro',play:'Hb Iso',type:'RUN',stars:3},
+    {set:'SINGLEBACK',f:'U Off Trips',play:'Inside Zone',type:'RUN',stars:2},
+    {set:'PISTOL',f:'Bunch TE',play:'Hb Zone',type:'RUN',stars:2}
    ]},
   {id:'backed_up',label:'BACKED UP (own 1-10)',color:'#e85547',group:'SPECIAL',
    desc:'Zero turnovers. Safe runs and quick RPOs off your own goal line.',
@@ -3273,7 +3348,10 @@ const SITUATIONS = [
     {set:'SINGLEBACK',f:'Ace Slot',play:'Inside Zone',type:'RUN',stars:1},
     {set:'GUN',f:'Doubles Y Off',play:'Jet Touch Pass',type:'PASS',stars:1},
     {set:'GUN',f:'Trips TE',play:'Hb Slip Screen',type:'PASS',stars:1},
-    {set:'GUN',f:'Bunch Str Offset',play:'Flood',type:'PASS',stars:1}
+    {set:'GUN',f:'Bunch Str Offset',play:'Flood',type:'PASS',stars:1},
+    {set:'GUN',f:'Bunch Str Offset',play:'Mtn Rpo Alert Swing',type:'RPO',stars:3},
+    {set:'PISTOL',f:'Doubles Y Off',play:'Zone Fake Jet',type:'RUN',stars:2},
+    {set:'SINGLEBACK',f:'Y Trips',play:'Jet Pa Slot Screen',type:'PASS',stars:2}
    ]},
 ];
 const FORMATIONS = [
@@ -3282,8 +3360,8 @@ const FORMATIONS = [
    presnap:['Expect 8-9 defenders in the box every snap','QB sneak is your automatic on 4th and inches','PA boot LT is lethal vs any man coverage here','PA power O vs any defense that crashed on a run fake'],
    plays:[{play:'Hb Sting',type:'RUN'},{play:'Hb Split O',type:'RUN'},{play:'Strong Toss',type:'RUN'},{play:'Qb Sneak',type:'RUN'},{play:'Hb Dive',type:'RUN'},{play:'Power O',type:'RUN'},{play:'Pa Power O',type:'PA'},{play:'Hb Counter Wk',type:'RUN'},{play:'Fb Dive',type:'RUN'},{play:'Hb Zone',type:'RUN'},{play:'Pa Spot',type:'PA'},{play:'Hb Power G',type:'RUN'},{play:'Pa Waggle',type:'PA'},{play:'Pa Sprint Hb Flat',type:'PA'},{play:'Pa Boot Lt',type:'PA'}]},
   {set:'Gun',name:'Trips TE',
-   identity:'Your primary formation. 3x1 with TE inline. IZ base run, full RPO library, TE corner and seam routes in the pass game. This is where DELTA lives.',
-   presnap:['Count the box — 6 or fewer means run','RPO alert bubble is your automatic vs any light box','TE alignment tells you if they subbed a LB or safety','Single high safety = seam is open, throw it'],
+   identity:'Your primary formation. 3x1 with TE inline. IZ base run, full RPO library, TE corner and seam routes. This is where DELTA lives.',
+   presnap:['Count the box — 6 or fewer means run','RPO alert bubble is your automatic vs any light box','TE alignment tells you if they subbed a LB or safety','Single high safety = seam is open'],
    plays:[{play:'Read Option',type:'RUN'},{play:'Read Option Bubble',type:'RUN'},{play:'Inside Zone',type:'RUN'},{play:'Hb Counter',type:'RUN'},{play:'Hb Mid Draw',type:'RUN'},{play:'Qb Zone',type:'RUN'},{play:'Speed Option',type:'RUN'},{play:'Rpo Alert Bubble',type:'RPO'},{play:'Rpo Read Y Flat',type:'RPO'},{play:'Rpo Zone Alert Slot Screen',type:'RPO'},{play:'Hb Angle',type:'PASS'},{play:'Hb Slip Screen',type:'PASS'},{play:'Double Under',type:'PASS'},{play:'Double In Sail',type:'PASS'},{play:'Slants',type:'PASS'},{play:'Y Shallow Cross',type:'PASS'},{play:'Verticals',type:'PASS'},{play:'Texas',type:'PASS'},{play:'Mtn Bench',type:'PASS'},{play:'Shuffle Mtn Levels',type:'PASS'},{play:'Wr Screen',type:'PASS'},{play:'Te Corner',type:'PASS'},{play:'Inside Cross',type:'PASS'},{play:'Flood',type:'PASS'},{play:'Shuffle Mtn Hb Swing',type:'PASS'},{play:'Mtn Rpo Read Flat',type:'RPO'},{play:'Shuffle Te Screen',type:'PASS'}]},
   {set:'Gun',name:'Trips TE Offset Wk',
    identity:'Trips with a weak-side offset. Return motion concepts and PA deep shots. Change-of-pace from base Trips TE.',
@@ -3302,7 +3380,7 @@ const FORMATIONS = [
    presnap:['Jet motion is your pre-snap coverage reveal','DB follows the jet = man coverage, run away from it','Zone defenders stay home — jet fake is your answer','Count how LBs react to the motion before the snap'],
    plays:[{play:'Inside Zone',type:'RUN'},{play:'Jet Inside Zone',type:'RUN'},{play:'Jet Power Read',type:'RUN'},{play:'Jet Counter Y',type:'RUN'},{play:'Read Option',type:'RUN'},{play:'Jet Hb Sweep',type:'RUN'},{play:'Zone Fake Jet',type:'RUN'},{play:'Shark Hb Wheel',type:'PASS'},{play:'Rpo Alert Bubble',type:'RPO'},{play:'Rpo Alert Hitches',type:'RPO'},{play:'Rpo Alert Wr Screen',type:'RPO'},{play:'Rpo Alert Counter Bubble',type:'RPO'},{play:'Jet Rpo Glance',type:'RPO'},{play:'Over Rpo Alert Zone',type:'RPO'},{play:'Jet Touch Pass',type:'PASS'},{play:'Jet Te Mid Screen',type:'PASS'},{play:'Slants',type:'PASS'},{play:'Mesh',type:'PASS'},{play:'Z Shallow Cross',type:'PASS'},{play:'Mtn Orbit Wr Option',type:'PASS'},{play:'Mtn Stick',type:'PASS'},{play:'Flood',type:'PASS'},{play:'Corner Strike',type:'PASS'},{play:'Redzone Scissors',type:'PASS'}]},
   {set:'Gun',name:'Y Off Trips',
-   identity:'Trips weak with counter and draw run game. RPO counter alert and peek stick. Your best counter-based formation.',
+   identity:'Trips weak with counter and draw run game. RPO counter alert and peek stick.',
    presnap:['Trips to the field — watch how many rotate over','GT counter and counter Y are your gap scheme base','RPO counter alert is your automatic vs light box','Watch the backside LB — he tells you give or pull'],
    plays:[{play:'Inside Zone',type:'RUN'},{play:'Read Option',type:'RUN'},{play:'Counter Y',type:'RUN'},{play:'Hb Counter',type:'RUN'},{play:'Gt Counter',type:'RUN'},{play:'Hb Draw',type:'RUN'},{play:'Hb Zone Toss',type:'RUN'},{play:'Rpo Zone Alert Bubble',type:'RPO'},{play:'Rpo Alert Wr Screen',type:'RPO'},{play:'Rpo Read Y Flat',type:'RPO'},{play:'Rpo Counter Alert',type:'RPO'},{play:'Rpo Zone Peek Stick',type:'RPO'},{play:'Hb Slip Screen',type:'PASS'},{play:'Te Mid Screen',type:'PASS'},{play:'Slants',type:'PASS'},{play:'Curls Slot Whip',type:'PASS'},{play:'Rub Z Under',type:'PASS'},{play:'Mtn Stick',type:'PASS'},{play:'Flood Hb Swing',type:'PASS'},{play:'Sprint Flood',type:'PASS'},{play:'Verticals Dig',type:'PASS'}]},
   {set:'Gun',name:'Y Off Trips Nasty',
@@ -3314,15 +3392,15 @@ const FORMATIONS = [
    presnap:['Read the defense pre-snap','Identify coverage type before the snap','Check box count on every run play','Motion to reveal man vs zone'],
    plays:[{play:'Power O',type:'RUN'},{play:'Inside Zone',type:'RUN'},{play:'Slot Fade',type:'PASS'},{play:'Crack Toss',type:'RUN'},{play:'Rollout Double Post',type:'PASS'},{play:'Fk Toss Verticals',type:'PASS'},{play:'Pin Pull Toss',type:'RUN'},{play:'Duo',type:'RUN'},{play:'Cross Hb Under',type:'PASS'}]},
   {set:'Gun',name:'Bunch Wide',
-   identity:'Wide bunch spread. Mesh, cheat shallow mills, and seam divide. Best 3rd and medium formation.',
+   identity:'Wide bunch spread. Mesh, cheat shallow mills, and seam divide.',
    presnap:['Read the defense pre-snap','Identify coverage type before the snap','Check box count on every run play','Motion to reveal man vs zone'],
    plays:[{play:'Inside Zone',type:'RUN'},{play:'Read Option',type:'RUN'},{play:'Mtn Rpo Split Alert',type:'RPO'},{play:'Bubble Screen',type:'PASS'},{play:'Hb Slip Screen',type:'PASS'},{play:'Cheat Shallow Mills',type:'PASS'},{play:'Mesh Spot',type:'PASS'},{play:'Quick Rub Return',type:'PASS'},{play:'Cheat Flood',type:'PASS'},{play:'Seam Divide',type:'PASS'},{play:'Drive Y Corner',type:'PASS'},{play:'Mesh Dagger',type:'PASS'}]},
   {set:'Gun',name:'Trips X Nasty',
-   identity:'X-nasty split. Quick game and layered route combinations. Hi lo cross and mtn spot y corner.',
+   identity:'X-nasty split. Quick game and layered route combinations.',
    presnap:['Read the defense pre-snap','Identify coverage type before the snap','Check box count on every run play','Motion to reveal man vs zone'],
    plays:[{play:'Inside Zone',type:'RUN'},{play:'Hb Mid Draw',type:'RUN'},{play:'Hb Off Tackle',type:'RUN'},{play:'Quick Unders',type:'PASS'},{play:'Quick Short Post',type:'PASS'},{play:'Quick Fork Zig',type:'PASS'},{play:'Mtn Triple Slants',type:'PASS'},{play:'Wr Smash',type:'PASS'},{play:'Hi Lo Cross',type:'PASS'},{play:'Hi Lo Dig',type:'PASS'},{play:'Mtn Drag Sluggo',type:'PASS'},{play:'Mtn Spot Y Corner',type:'PASS'},{play:'Mtn Slot Fades',type:'PASS'},{play:'Mtn Stick Wheel',type:'PASS'},{play:'Verticals X Shallow',type:'PASS'}]},
   {set:'Gun',name:'Empty Trey Flex',
-   identity:'Your best empty formation. QB draw threat, jailbreak screen, and deep vertical combinations.',
+   identity:'Your best empty formation. QB draw threat, jailbreak screen, deep verticals.',
    presnap:['Five receivers — count the rushers first','QB draw is your answer when they drop 8','Single high = four vertical is open','Jailbreak screen vs any all-out blitz'],
    plays:[{play:'Qb Blast',type:'RUN'},{play:'Qb Draw',type:'RUN'},{play:'Rpo Alert Draw Stick',type:'RPO'},{play:'Wr Screen',type:'PASS'},{play:'Mtn Jailbreak Screen',type:'PASS'},{play:'Slot Slants',type:'PASS'},{play:'Y Stick',type:'PASS'},{play:'Dbl Slot Cross',type:'PASS'},{play:'Levels Switch',type:'PASS'},{play:'Hi Lo Read',type:'PASS'},{play:'Smash',type:'PASS'},{play:'Mtn Slot Out',type:'PASS'},{play:'Rz Mtn Inside Smash',type:'PASS'},{play:'Vertical Y Shake',type:'PASS'},{play:'Four Vertical',type:'PASS'}]},
   {set:'Gun',name:'Empty Quads HB',
@@ -3377,6 +3455,10 @@ const FORMATIONS = [
    identity:'Singleback U. Motion power and PA concepts.',
    presnap:['U-back changes box count — watch how defense adjusts','Lead read option with light box is free yards','Orbit HB split zone vs any flowing defense','PA y corner vs Cover 3 is a touchdown play'],
    plays:[{play:'Inside Zone',type:'RUN'},{play:'Inside Zone Split',type:'RUN'},{play:'Hb Counter Str',type:'RUN'},{play:'Hb Slam',type:'RUN'},{play:'Hb Misdirection',type:'RUN'},{play:'Motion Power',type:'RUN'},{play:'Mtn Zone Toss',type:'RUN'},{play:'Slants',type:'PASS'},{play:'Pa Boot Slide',type:'PA'},{play:'Pa Flood',type:'PA'},{play:'Pa Dagger U Cross',type:'PA'},{play:'Mtn Pa Y Corner',type:'PA'}]},
+  {set:'Gun',name:'Empty Bunch',
+   identity:'Empty bunch set. Spacing, verticals, and divide wheel concepts.',
+   presnap:['Empty bunch — count box defenders immediately','QB draw is automatic against soft zones','Spacing and verticals stress every coverage level','Bubble screen vs any blitz or heavy rush'],
+   plays:[{play:'Curl Flats',type:'PASS'},{play:'Divide Wheel',type:'PASS'},{play:'H Trail Smash',type:'PASS'},{play:'Qb Crack Sweep',type:'RUN'},{play:'Qb Draw',type:'RUN'},{play:'Spacing',type:'PASS'},{play:'Verticals',type:'PASS'},{play:'Y Curl',type:'PASS'},{play:'Z Spot',type:'PASS'}]},
   {set:'Wildcat',name:'Bunch HB Str',
    identity:'Wildcat bunch. Speed option and read option misdirection.',
    presnap:['Read the defense pre-snap','Identify coverage type before the snap','Check box count on every run play','Motion to reveal man vs zone'],
@@ -3386,7 +3468,6 @@ const FORMATIONS = [
    presnap:['Read the defense pre-snap','Identify coverage type before the snap','Check box count on every run play','Motion to reveal man vs zone'],
    plays:[{play:'Power',type:'RUN'},{play:'Counter',type:'RUN'},{play:'Blast',type:'RUN'},{play:'Jet Reverse Pass',type:'PASS'},{play:'Diy Reverse',type:'RUN'},{play:'Jet Sweep',type:'RUN'}]},
 ];
-
 const AUDIBLES = {
   'Goal Line|Goal Line Normal': {'Base Run':'Power O','Option/RPO':'Hb Counter Wk','Man Beater':'Pa Boot Lt','Zone Beater (shock)':'Pa Waggle'},
   'Gun|Trips TE': {'Base Run':'Inside Zone','Option/RPO':'Rpo Alert Bubble','Man Beater':'Inside Cross','Zone Beater (shock)':'Double In Sail'},
@@ -3413,6 +3494,7 @@ const AUDIBLES = {
   'Singleback|Ace Slot': {'Base Run':'Inside Zone','Option/RPO':'Hb Zone Alert Bubble','Man Beater':'Stick','Zone Beater (shock)':'Pa Ctr Waggle'},
   'Singleback|Y Trips': {'Base Run':'Inside Zone','Option/RPO':'Hb Power Alert Bubble','Man Beater':'Se Cross','Zone Beater (shock)':'Sluggo Seam'},
   'Singleback|U Off Trips': {'Base Run':'Inside Zone','Option/RPO':'Motion Power','Man Beater':'Slants','Zone Beater (shock)':'Pa Dagger U Cross'},
+  'Gun|Empty Bunch': {'Base Run':'Qb Crack Sweep','Option/RPO':'Spacing','Man Beater':'H Trail Smash','Zone Beater (shock)':'Divide Wheel'},
   'Wildcat|Bunch HB Str': {'Base Run':'Read Option','Option/RPO':'Speed Option','Man Beater':'Pa Read','Zone Beater (shock)':'Qb Wrap'},
   'Wildcat|Unbalanced': {'Base Run':'Power','Option/RPO':'Counter','Man Beater':'Jet Reverse Pass','Zone Beater (shock)':'Diy Reverse'},
 };
